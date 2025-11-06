@@ -1,0 +1,442 @@
+player_id,full_name,position,height,weight,birthdate,college
+0039617f-5e20-4c83-a324-da7321514927,Viktor Lakhin,C,83,247.0,2001-07-30,Clemson
+01830f03-cbe5-4cc9-8696-03df11438921,Jazian Gortman,G,74,184.0,2003-03-14,
+28517bbb-e854-4177-9cb0-b3d60e27b658,Payton Sandfort,F,79,215.0,2002-07-12,Iowa
+3e0258fd-74cd-4150-a990-ad10ab569ab8,Cameron Brown,F,78,225.0,2001-05-10,
+53597494-78f8-44e5-afe0-1059670f941b,Brooks Barnhizer,G,77,230.0,2002-03-02,Northwestern
+b2469fa3-64e1-48c7-b620-eca1740dfd6a,Chris Youngblood,G,76,221.0,2002-02-09,Alabama
+b5e38bf2-0ff7-4d5d-b5f3-b44ff792a0ea,Anthony Pritchard,G,74,185.0,2000-01-01,Central Michigan
+b7d49d29-5243-48a1-8dae-246a9e221b24,Kendall Munson,F,80,235.0,2000-01-01,Jacksonville
+c44907d4-1082-4bbf-8883-47cbdfff4dcd,Malevy Leons,F,81,210.0,1999-09-23,Bradley
+dae289ed-2be3-40fb-83bd-5071b6f677b1,Branden Carlson,C,84,220.0,1999-06-14,Utah
+e4a5c081-0527-41af-bace-caa3ffd94c45,Dariq Whitehead,F,78,220.0,2004-08-01,Duke
+ee9ca067-45f4-4a32-99fd-a1b35c322725,Zack Austin,G,77,216.0,2001-08-11,Pittsburgh
+f97a592a-ac33-488d-9df4-909899fa5e79,Buddy Boeheim,F,77,205.0,1999-11-11,Syracuse
+13fd950f-cdcc-4870-aae4-e4ed6d9dd28a,Augustas Marčiulionis,G,76,200.0,2002-03-21,Saint Mary's
+32910f1d-edfc-4ecc-b711-6aeb07bd2586,Nick Smith Jr.,G,74,185.0,2004-04-18,Arkansas
+32c03673-0dc7-42a3-8371-9769884a7276,R.J. Davis,G,72,180.0,2001-10-21,North Carolina
+3330fea9-e10f-4963-bf1b-8090e0a6e4a1,Anton Watson,F,80,225.0,2000-10-06,Gonzaga
+372c3587-31c2-4a98-ab75-bec1c2a90e6e,Erik Timko,G,77,200.0,2002-01-31,Delaware
+46c67c77-f522-4be0-882f-ef5acdc60776,Luke Goode,F,79,210.0,2002-08-24,Indiana
+6098aa53-0dd5-4b8d-a67e-7ff785c1ecbc,Kylor Kelley,C,84,230.0,1997-08-26,Oregon State
+738e9b6d-8d4f-4198-b906-d4f5a59cae14,James Reese,G,76,170.0,1998-12-08,South Carolina
+7c42b21f-1179-42c8-bba9-15f800d5d7b3,Christian Koloko,C,83,225.0,2000-06-20,Arizona
+811813a7-f3cb-4055-b682-9636f2818176,Arthur Kaluma,F,79,225.0,2002-03-01,Texas
+8d7a420f-b7f2-4a43-adab-de9bd1681a2c,Jarron Cumberland,G,77,205.0,1997-09-22,Cincinnati
+9addd555-9865-41e6-9f63-e03cb78c98f6,Jace Carter,G-F,78,225.0,2003-11-04,Texas A&M
+bc293962-9c60-44d5-ba68-76ebfb37a07f,Drew Timme,F,81,235.0,2000-09-09,Gonzaga
+e891cdde-5be0-4f5e-9132-59f5431b07b7,Chris Mañon,G,76,209.0,2001-12-09,Vanderbilt
+ef264884-3312-4c1e-aa6a-f05653dfa76b,Tevian Jones,G,78,220.0,2000-06-29,Southern Utah
+ef599d54-6508-4cb4-b796-dfc9d689e65e,Joirdon Nicholas,F,81,220.0,1999-03-29,Texas Southern
+f3efa42e-5d7b-438e-898a-441a1cb950f1,Braxton Meah,C,85,250.0,2000-01-01,Nebraska
+f42771be-961c-4401-8048-7ca4611bd5b7,Selton Miguel,G,76,209.0,2000-10-24,Maryland
+f972baf8-f857-40aa-956a-7b63aee9c8ce,Cheikh Mbacke Diong,F,83,235.0,1999-12-11,UCF
+052a06be-1070-461b-9f5a-9eea0196390f,Pierre Crockrell II,G,72,180.0,2000-01-21,
+34bd9c5c-105b-4648-b609-c3c715f793c0,Justice Smith,G-F,78,215.0,2000-01-01,Niagara
+37c3c684-d63d-4c00-bcee-0351e210d5a4,James Banks III,C,82,250.0,1998-01-16,Georgia Tech
+44854b18-55ab-464a-bf18-ca601b8bca8d,Riley Minix,F,79,230.0,2000-09-22,Morehead State
+476af880-e05b-4d97-9c8b-c46f863bf505,Stanley Umude,G,78,210.0,1999-04-12,Arkansas
+4d9c6d1d-be63-4bc6-b70f-69e22ede6785,Kyle Mangas,G,76,200.0,1999-04-08,Indiana Wesleyan
+5dbccdb7-ed1d-4efa-ab54-f59b2a1276f2,Adam Flagler,G,73,180.0,1999-12-01,Baylor
+78f23ef4-e1d9-4f90-a914-de7542f79121,Jamaree Bouyea,G,74,180.0,1999-06-27,San Francisco
+906dd7dd-39ef-48dd-bf07-24aaf29f2d5f,Kobe Stewart,G-F,78,180.0,2000-01-01,Presbyterian
+a38005b8-a09f-4943-b08c-bab3870a2766,Micah Potter,C,81,248.0,1998-04-06,Wisconsin
+ade2b8e1-bd14-4e39-b65f-4b1610ebdb7f,Isaiah Miller,G,72,180.0,1997-11-09,UNC Greensboro
+c7fd537e-d8f8-4739-8df6-d7f529beda9f,Osayi Osifo,F,81,230.0,2000-04-06,Florida
+c9351cca-c4a6-4f8d-8dd7-52809348cb53,Harrison Ingram,F,77,230.0,2002-11-27,North Carolina
+d7b0713c-6c22-4ddf-a1b9-21f65111b755,David Jones-Garcia,F,76,210.0,2001-11-24,Memphis
+dbc329fe-76f2-4398-bfc9-1dffd848b410,Jayden Nunn,G,76,190.0,2003-05-07,Baylor
+dde9356d-a351-4f0d-933b-83f9602d72e3,Jahmal McMurray,G,72,180.0,1997-02-23,SMU
+68df4b78-b4b6-459a-8f8d-26446731141b,Kihei Clark,G,70,167.0,2000-01-25,Virginia
+72088ffc-bf13-4fbb-b2fe-8d7500b95bcf,Juan Toscano-Anderson,F,78,209.0,1993-04-10,Marquette
+76628217-a914-4813-bc59-7302ce03506b,Rodrigo Dominguez,G,70,,1995-01-01,
+9918d5c7-ced3-4a6b-a382-446f13715c67,Felipe Haase,F,81,245.0,1998-03-19,
+a246c145-e19b-4781-85aa-3f74007cb3f1,Jaylan Gainey,F,82,230.0,1999-12-12,Florida State
+a65af8af-deae-475f-bd5b-72d30f0296fb,Ivan Gandia-Rosa,G,73,193.0,,
+163d17b9-7beb-40ef-a847-8c96c27f4bbd,Romeo Weems,F,79,215.0,2001-06-09,DePaul
+208913ca-ef1b-4da6-8d28-c016b8cb872a,Caleb Love,G,76,205.0,2001-09-27,Arizona
+2d208ca1-6b5e-47eb-ba69-91b924e722d1,Cameron Tyson,G,75,190.0,1999-10-26,Seattle
+4721218f-3b63-4260-9006-985c18a35660,Justin Minaya,F,77,205.0,1999-03-26,Providence
+488090a7-11c9-4a85-ac0c-cb5219df3afa,Sidy Cissoko,G,78,200.0,2004-04-02,
+48f80bb3-0902-429a-ac36-c27cd93fb9aa,Vincent Valerio-Bodon,G-F,81,210.0,2001-05-02,
+60157a50-815e-41e6-9b96-a1a174788de1,Javonte Cooke,G,78,185.0,1999-07-11,Winston-Salem State
+6a5ff651-62ae-4dcb-9d2f-c190c078d92b,Terquavion Smith,G,76,160.0,2002-12-31,NC State
+76da047b-36cf-469d-a694-477565014e38,Jaykwon Walton,G,79,206.0,2001-07-12,Memphis
+7aed7e06-3d22-48b8-b777-bc00a4f83a11,Devonte' Graham,G,73,195.0,1995-02-22,Kansas
+e8367a1f-359c-47db-8468-ae5effd32af1,Dmytro Skapintsev,C,84,215.0,1998-05-12,
+28a68c8e-f3c7-46e7-8b21-c0b6d7c6c093,Jules Bernard,G,78,210.0,2000-01-21,UCLA
+38a37db6-e1e5-421a-80b0-8e708458a774,Alize Johnson,F,80,212.0,1996-04-22,Missouri State
+3cfa7533-555d-490c-840b-e17a32d23c0e,CJ Fulton,G,75,190.0,2002-06-24,Charleston
+4912061c-463a-4de8-905d-91838ddd6dbf,Zyon Pullin,G,76,206.0,2001-03-03,Florida
+5c871d29-614a-44cd-8a3f-cc3f76256fd8,Johnny Juzang,G,77,209.0,2001-03-17,UCLA
+71cff726-7492-46ad-8dd5-4fb7d30d77a1,Enrique Freeman,F,79,212.0,2000-07-29,Akron
+7e640791-4506-45e7-87a0-3da6b4fa282d,Caleb Stone-Carrawell,F,79,220.0,,Loyola Marymount
+cf0c8f6b-82b7-4ad4-8a24-41c962268ad9,Martez Brown,G,80,218.0,2000-10-08,
+d49bc3d7-fc9c-4e9d-96ab-c4b9830162f3,Donte Ingram,F-G,78,215.0,1996-08-15,Loyola (Chicago)
+d8d3943e-f1c1-46ae-937f-1195eb6c554b,Nate Santos,F,79,215.0,2001-11-09,Dayton
+e93c89fb-6893-4027-b372-bf8f870d4bd5,Tristen Newton,G,75,192.0,2001-04-26,UConn
+f4c76b0e-e8ad-4b55-b040-4e36268356a2,Nojel Eastern,G,78,220.0,1999-05-26,Purdue
+f4ed7662-71d7-49b6-97ba-f6db3f13333d,Rocco Zikarsky,C,86,227.0,2006-07-11,
+171571f2-e236-46be-91bc-06fe93e4569b,GG Jackson II,F,81,210.0,2004-12-17,South Carolina
+1a2af227-d5fc-4319-964a-f86aeaf91a0b,Javon Small,G,73,190.0,2002-12-19,West Virginia
+284ad559-7fb8-4e63-811e-fb8277171d01,Mãozinha Pereira,F,80,177.0,2000-08-28,
+422d9c3f-d1a9-4502-8af1-20ec5ddd8de0,Kamani Johnson,F,79,230.0,1998-09-03,Arkansas
+5abf4edd-de74-48c6-8e1f-cb484a48c9a2,Olivier-Maxence Prosper,F,80,230.0,2002-07-03,Marquette
+77cef222-60c8-401c-b926-86f30bf9814a,Armando Bacot,F-C,83,240.0,2000-03-06,North Carolina
+80c2a5a3-7742-4cd8-9f0d-d368f3790781,Jordan Minor,F,80,242.0,2000-03-11,
+8d6c07da-029b-4d44-af34-0f64c6566564,Evan Gilyard,G,70,170.0,,Kansas City
+93456abf-9d46-4afa-a5d7-da628c862656,Tyler Burton,F,79,215.0,2000-02-11,Richmond
+97253d40-87db-493b-ac2f-701d31875f90,Race Thompson,F,80,235.0,1999-06-04,Indiana
+9e3cbb49-2529-42d3-b3b6-7234f30e6354,PJ Hall,C,82,238.0,2002-02-21,Clemson
+b97e66cf-1d9b-4698-958f-497e19246314,Nate Hinton,G-F,77,210.0,1999-06-08,Houston
+d3e43286-1845-4691-b62d-1c3a93a8cce3,Lucas Williamson,G,76,205.0,1999-01-28,Loyola Chicago
+f4809e97-dd44-4ddc-9c2e-a1171c6e0f31,Cam Spencer,G,76,205.0,2000-04-06,UConn
+077d1ae5-a3b1-46f3-b6ce-d7d308e3f260,Patrick Baldwin Jr.,F,84,220.0,2002-11-18,Milwaukee
+2138eda0-0317-455b-80ab-3f4b26b025b9,Yauhen Massalski,F-C,81,240.0,1999-03-25,San Francisco
+3017dc2d-5d16-40dd-b0a0-d2b952d9dec6,Jordan Lathon,G,77,195.0,2000-02-25,Morehead State
+3fd28d36-0620-455c-8108-25d159af6d08,Ileri Ayo-Faleye,F,80,210.0,2000-01-01,Vermont
+422c8fb2-cf63-4adf-922e-455d46d6ef2c,John Poulakidas,G,78,205.0,2003-04-04,Yale
+434ec5e3-639a-49d8-836a-149a105acb44,Nate Darling,G,77,200.0,1998-08-30,Delaware
+449b6231-effb-4e5a-8fe1-5a4bc773327e,Jaelen House,G,72,170.0,2001-05-02,New Mexico State
+59381efa-4dbd-40e8-9d6a-e08d45e71b98,Shakur Daniel,G,78,185.0,1999-06-09,Tarleton State
+63169bf8-2c5a-45a0-90a2-e1f04d88d1d8,Jordan Miller,G,77,194.0,2000-01-23,Miami
+67b29de4-6029-48b5-9453-9bd00ff70a7d,Izaiah Brockington,G,76,196.0,1999-07-12,Iowa State
+761260a9-4cf6-43b9-a78e-df628a1da8b5,Jahmyl Telfort,F,79,225.0,2001-04-30,Butler
+86021a55-561b-407a-b674-1fb456e9197b,Matt Allocco,G,76,197.0,2000-01-01,Notre Dame
+885bfe29-7568-4e8b-8a68-86703b15198c,Derek Ogbeide,F,81,250.0,1997-03-28,Georgia
+8a00f4f2-8820-40e1-94e9-6b18a149bf65,Jason Preston,G,75,181.0,1999-08-10,Ohio
+971dddd3-9483-4910-b7d9-3965f1907536,TyTy Washington,G,75,195.0,2001-11-15,Kentucky
+9b03aa8c-3986-41da-9d59-ecd17d84cac8,Taylor Funk,F,80,230.0,1997-11-06,Utah State
+bcf34fa2-1132-4507-b834-944b9bda25cf,Zach Freemantle,F,81,227.0,2000-10-18,Xavier
+f284dc0f-f4f5-4dbf-8daa-1e6bbe75d879,Kobe Sanders,G,80,207.0,2002-05-30,Nevada
+05362b95-e60c-4ede-9f06-e79839db8541,Jordan Hinds,G,77,,,Bluefield State
+2177f273-f194-4883-b905-97cec3da81e1,Moses Byekwaso,F,81,191.0,1997-04-24,
+225c025c-fb9f-4c4f-9ef4-502c171449fe,Teddy Allen,F,78,212.0,1998-06-07,New Mexico State
+3e2f637d-4a01-4b28-9fea-95f7ec465982,Caleb McConnell,G,79,195.0,1999-06-08,Rutgers
+42a7123b-133f-46c8-a950-f44ae099dbdc,John Knight III,G,75,205.0,1999-05-12,Southern Utah
+4f22d0e1-0da6-4e34-9ba8-be6daf334801,Efe Abogidi,F,81,228.0,2001-10-11,Washington State
+64aad35f-adbd-4148-a431-704d09375ed2,Jaylen Murray,G,71,165.0,2003-06-09,Mississippi
+72af3431-8dad-4411-a032-f271175920f9,Vin Baker Jr.,G-F,81,208.0,1999-05-26,Milwaukee
+7dbd0886-9aa6-4046-8453-0c7541876364,Garrett Denbow,G,78,200.0,2000-08-05,Anderson (SC)
+93dbe055-6a24-46c9-b885-94a2f7d229c4,JD Davison,G,73,195.0,2002-10-03,Alabama
+95dcc850-750d-4938-bba1-48580b59218f,Tyrese Hunter,G,72,180.0,2003-08-11,Memphis
+960add57-fcc3-450e-bc7d-56dc9e8e1395,Vernon Carey Jr.,C,81,260.0,2001-02-25,Duke
+ac4fb6fa-8204-40ab-99b1-96a91fcdfcad,Ricky Council IV,G,78,207.0,2001-08-03,Arkansas
+ad07898e-4a1b-42a9-90b8-20af532b8a0c,Kevon Harris,G,77,216.0,1997-06-24,Stephen F. Austin
+d2fe926b-603b-4a62-a98d-bda4cfac77d0,Stephen Mitchell,G,75,200.0,2003-01-29,Marquette
+e1fe4492-79a3-4ee6-a6c8-773b690a58c6,Daishen Nix,G,76,238.0,2002-02-13,
+e751f5e8-b6fd-4bf3-8a1e-f066cc21761d,Isaiah Crawford,F,78,220.0,2001-11-01,Louisiana Tech
+f877d039-018d-420f-bbf1-110b38809b78,Cameron Matthews,F,79,235.0,2001-12-23,Mississippi State
+0261c4b7-affe-40be-8d26-a3c77720e3ec,Trey Galloway,G,77,205.0,2001-11-28,Indiana
+0b97fcb1-fed9-4287-8702-0a41853ed907,Jacksen Moni,F,82,235.0,2003-02-20,North Dakota State
+1fa2ae9f-8229-4efd-9a27-8eddcfd4810f,Derrin Boyd,G,75,215.0,2000-12-10,Charleston
+224d4b2f-f67d-40e6-8a63-d6b7e0bbf8a7,Jimmy Whitt,G,75,175.0,1997-01-09,Arkansas
+452f9a53-37df-4e09-8f49-63cbe2a330ea,Riley Grigsby,G-F,78,220.0,1999-12-29,Seattle
+4a461bb4-6163-433f-abd9-83815ab72732,LJ Cryer,G,72,200.0,2001-10-09,Houston
+4b40c79d-0d22-4fd2-af0e-8e86c2d69a7b,Jackson Rowe,F,79,210.0,1997-01-04,Cal State Fullerton
+4b8e8a16-7bc0-4ae9-8989-53a75646f806,Marques Bolden,C,82,249.0,1998-04-17,Duke
+5d68e4c3-79b3-4b0f-889b-42eb24a58ef7,Jack Clark,F,82,215.0,,VCU
+73bf7946-50e5-4dd9-85cf-af76ae58a388,Alex Toohey,F,80,223.0,2004-05-05,
+74aee57f-aa28-427a-81aa-4faf7f8c815e,Chance McMillian,G,75,190.0,2001-02-06,Texas Tech
+7b10587d-f933-42f9-b6e8-d04a1c9907c6,Taevion Kinsey,G,77,190.0,2000-03-10,Marshall
+a89bdce8-a0c0-41a7-8a84-5cc976c75ef3,Ja'Vier Francis,F,80,235.0,2003-10-20,Houston
+e0acc2ad-c8a7-47bf-a830-62e17c676a4a,Franco Miller Jr.,G,75,201.0,1999-02-08,Florida Gulf Coast
+e1d463c8-0c2f-4872-9147-b8d972f3cc8c,Ethan Taylor,G,77,205.0,2002-01-06,Airforce
+ed33da5f-39c7-421f-ab92-5fb4cd38ea6c,Michael O'Connell,G,74,195.0,2001-02-23,North Carolina State
+ed6d7e45-71a0-4d94-b54b-cc191035a03b,Pat Spencer,G,75,205.0,1996-07-04,Northwestern
+0f2bc955-34ae-47e8-ab40-4d4b6bb573fe,Gabe Levin,F,80,235.0,1994-08-02,Long Beach State
+113ba150-5c10-478e-92bd-fa4ffddce657,Antoine Davis,G,73,165.0,1998-10-03,Detroit Mercy
+13d870e4-a08e-444b-9ac3-3e2e7c6d405a,Brian Bowen II,F-G,78,190.0,1998-10-02,
+577218d1-1739-450a-b691-e153a82aef16,Isaiah Stevens,G,72,185.0,2000-11-01,Colorado State
+725ad6d8-da25-44ea-95ec-a4e91ea30da9,Joey Calcaterra,G,75,180.0,1998-10-15,UConn
+95e2bd5d-094a-4dff-9efa-63b6e4806e9e,Dylan Cardwell,C,83,255.0,2001-12-16,Auburn
+b7b5d5a6-17ae-41aa-a189-1e84932c1b2e,Jaylin Williams,F,80,245.0,2000-07-26,Auburn
+c0bce8b9-9a6f-42a0-a7aa-96277ee6dc66,Chasson Randle,G,73,192.0,1993-02-05,Stanford
+c7c77b49-f6a4-4d27-be55-0b2f29793ee6,Daeqwon Plowden,G-F,78,216.0,1998-08-29,Bowling Green
+ca588494-e5df-4452-a6a3-69040d78ca5a,Jon Elmore,G,75,190.0,1995-12-20,Marshall
+dfc83dbf-7142-4141-9f56-8ea882843973,Dexter Dennis,G,77,210.0,1999-02-09,Texas A&M
+e2ee4cdd-45d2-4b5c-ab9c-5650a4fa53e0,Mason Jones,G,76,200.0,1998-07-21,Arkansas
+fd111755-8113-4461-bd7e-74a55f5e4fa6,KJ Jones II,G,78,190.0,2001-03-31,Emmanuel
+1910a6a1-ac87-41dc-b31b-766bb3d9e753,Teafale Lenard,F,80,175.0,2002-07-21,Middle Tennessee
+1bd4d498-337e-4b5a-ba06-358f5a66700d,Miles Kelly,G,78,190.0,2003-01-26,Auburn
+2298edd4-1dc8-4971-854b-bd8cc3b5ebeb,Jordan Hall,G,79,215.0,2002-01-14,Saint Joseph's
+496b6738-7857-4941-8f55-02ef9e1d4729,Tyson Walker,G,73,185.0,2000-09-18,Michigan State
+68dfa26e-3ec3-4f53-bd77-49fd24329a0a,Justin Powell,G,77,197.0,2001-05-09,Washington State
+6df153aa-42ba-4688-90dc-cec17bbe10cf,Dakota Rivers,F,80,208.0,2001-06-21,Florida Gulf Coast
+72518756-924a-4b9e-96a2-b535d46f14dd,Jarod Lucas,G,76,195.0,1999-12-07,Nevada
+7f8d8bf0-b413-4a56-adf1-fd85e7c296ff,Zhaire Smith,G,76,205.0,1999-06-04,Texas Tech
+8d4c6c0c-8752-478b-a2cf-e6105728cc2a,Ryan Nembhard,G,72,180.0,2003-03-10,Gonzaga
+96c3a34f-ba5c-4fa1-8820-00175dfb22d8,Kessler Edwards,F,79,203.0,2000-08-09,Pepperdine
+a6da1b4b-0203-403e-8e8e-8c071684958d,Asanti Price,G,77,170.0,2001-08-27,Benedict
+abc70672-df03-4b06-bd17-b4a71ba0af0f,Tanner Holden,F,78,200.0,2000-04-06,Wright State
+cbfee037-55c1-414b-acdd-c61fc5dcb3e2,Kok Yat,F,79,194.0,2003-06-12,
+d5210d98-7479-4dca-a8ce-d085588fa3c6,Jamarion Sharp,C,89,235.0,2001-08-26,Ole Miss
+e1460401-b1cd-474a-81ce-749b5215cdd1,Tray Maddox,G,78,200.0,2000-08-13,Western Michigan
+0fb91f24-6441-4361-a99a-b09b8456b12c,CJ Huntley,F,81,190.0,2002-01-06,Appalachian State
+279690d7-4bc1-4271-94d5-307b4012702f,Nathan Mariano,F-C,81,211.0,2003-09-16,
+2903249e-943d-4b9a-ae3a-976167275260,Jaden Shackelford,G,75,200.0,2001-02-14,Alabama
+3340e077-9d09-459d-9113-e97962f92044,Sean McDermott,F,78,195.0,1996-11-03,Butler
+3c47bdc6-5e68-481a-a0d7-38107c327bc8,Kaleb Johnson,G,78,205.0,1996-11-21,Georgetown
+73e3656b-e68f-404b-b5b8-e7b909707963,Tyrese Samuel,F,82,239.0,2000-03-10,Florida
+78f6047a-c8bd-4f37-b7b6-988a5f4e9b7d,Bryce Thompson,G,77,200.0,2002-02-26,Oklahoma State
+a7cee3a6-604c-49a4-b173-61f74710e29c,Isaiah Hawthorne,F,80,205.0,2001-08-28,Northern Colorado
+b79748d1-6222-4a37-87ce-7318f71faa5a,Koby Brea,G,77,215.0,2002-11-06,Kentucky
+cc9bf2b8-08e8-4b81-b18e-696b8af229cb,Alex Schumacher,G,75,185.0,2001-02-20,
+e85e21ba-3c3d-4360-9a14-8e59fa1e16e3,Damion Baugh,G,76,194.0,2000-08-03,TCU
+eeaa6f29-7c6d-4fee-983c-ad91de5b3e5f,Mason Madsen,G,76,195.0,2001-05-01,Utah
+f0b85c94-1fdd-49bd-b279-ee7cafe227a7,Isaiah Livers,F,78,232.0,1998-07-28,Michigan
+1e2ee032-e391-4ac0-b966-d3a9919461bd,Caleb Daniels,G,76,210.0,1999-05-17,Villanova
+2400d44d-3811-4590-9e5d-ac29b3339af4,Nassir Little,F-G,78,220.0,2000-02-11,North Carolina
+25ef1ab3-775e-4cb5-ad59-5d3bb2ed7220,Warren Washington,F,84,225.0,2000-03-03,Texas Tech
+2a49957a-acd8-4655-be73-2ff2cdeb3e18,Malik Williams,C,83,250.0,1998-08-26,Louisville
+44d57a96-c7b9-43d7-a4a1-9fea44114209,Tony Snell,G,78,213.0,1991-11-10,New Mexico
+643946f5-5b29-43d2-99d5-22ee5923088c,Vladislav Goldin,C,85,250.0,2001-05-12,Michigan
+7f8bb4c4-2787-44cf-8968-940fe55094b6,Dru Smith,G,74,203.0,1997-12-30,Missouri
+c391167a-7ee5-4623-bd25-ea1898b0112c,Xavier Johnson,G,75,200.0,1999-10-14,Indiana
+c55e1ce7-7622-4c64-8c5c-2cd5d2ad856a,Jahmir Young,G,73,185.0,2000-10-07,Maryland
+cfb0d131-837c-4cb0-b803-a9ff1d8b4fe6,Myron Gardner,F,78,220.0,2001-05-21,Little Rock
+e1b3c387-7c52-45c6-ab79-53e2ee18c9df,Christian Brown,G,78,205.0,2000-07-15,Tennessee State
+f4b44e1d-7fde-459a-8f95-987ee50a9a69,Keshad Johnson,F,79,225.0,,
+29f1e230-157e-4f14-886e-e65bae3910f0,Oscar Tshiebwe,F-C,80,255.0,1999-11-27,Kentucky
+70a07f9e-a025-43e7-b744-f28fd4da5ab2,Elijah Harkless,G,75,195.0,2000-02-03,UNLV
+ad0462fd-9563-41bb-b525-63558edcf2c2,Isaiah Thomas,G,69,185.0,1989-02-07,Washington
+b8339cdf-c448-4802-adc8-f19e36bf0b2d,John Tonje,G,77,212.0,2001-04-23,Wisconsin
+c0800b1d-db45-4393-a6e3-67db4d6b29e1,Justin Harmon,G,79,245.0,1999-10-22,
+cf100451-e42f-4635-818c-c22d9aedc2a7,Max Abmas,G,71,162.0,2001-04-02,Texas
+ef7dda60-cf71-42b3-bb11-0e75d55314b6,Darin Green,G,76,190.0,2001-01-15,Florida State
+f00b9c0d-9d84-4ee7-bf30-18af527c55eb,Dereon Seabron,G,77,180.0,2000-05-26,North Carolina State
+0a17fc81-fb60-4fc7-a2f8-68526dff94fb,Patrick Gardner,C,83,250.0,1999-06-16,Marist
+1127d922-6d3e-4893-8618-edf05bd92334,Alex Morales,G,78,180.0,1997-11-21,Wagner
+1a5d3d9d-1810-4558-b7cb-29d092a4d82b,Orlando Robinson,C,82,235.0,2000-07-10,Fresno State
+40042b5d-3e8e-4cbf-9178-b9ca17fc861f,Mike Miles Jr.,G,74,220.0,2002-08-24,TCU
+b4834357-58ff-45e6-86b9-e0886d058875,Jamal Cain,F,79,207.0,1999-03-20,Marquette
+c2618510-970f-47ab-89ff-6f08d0468fda,Xavier Pinson,G,75,174.0,2000-06-23,New Mexico State
+c94689c3-9390-4465-bece-5545c7d5f3f5,Javonte Smart,G,76,205.0,1999-06-03,LSU
+c9b319df-6ae5-4863-8cc9-81ed3efbd35e,Colin Castleton,C,82,250.0,2000-05-25,Florida
+e2b37833-3eef-4f35-8f3a-1f8c86b8f995,Javon Freeman-Liberty,G,75,190.0,1999-10-20,DePaul
+035988cb-b180-4f0d-b341-effb3ee78f5e,Patrick McCaw,G,79,181.0,1995-10-25,UNLV
+175b1d50-ef8d-4d65-a46a-864d73342aab,A.J. Lawson,G,78,179.0,2000-07-15,South Carolina
+3073aacf-1df1-4c77-bad0-ed02009a1a87,David Roddy,F,76,255.0,2001-03-27,Colorado State
+376411cd-0768-4e9d-97c0-16ecb0ed3ce1,Julian Reese,F,81,252.0,2003-06-30,Maryland
+3c5969e4-f562-41e3-b494-12e886f9a643,Jarkel Joiner,G,73,181.0,1999-05-21,North Carolina State
+3fa6b55d-11e9-4cf3-b100-02c399a2e500,Alijah Martin,G,74,210.0,2001-12-26,Florida
+4fc2c10c-1044-42e7-a4c9-22b4f453a76f,Tyreke Key,G,74,211.0,,Tennessee
+51c31a3e-f5dd-4174-8c88-d64a9fbc9efc,Jaden Bediako,C,82,240.0,,Seton Hall
+5cbe8c5f-59f0-45ce-a1c9-f6004c80da5d,Jared Rhoden,G,77,210.0,1999-08-27,Seton Hall
+8aaf7a44-a5a9-4f15-9499-243e61683d83,Quincy Guerrier,G-F,80,220.0,1999-05-13,Illinois
+8f4f7016-d993-407c-a881-8cf3bb883ff9,Tyson Degenhart,F,80,235.0,,Boise State
+97f14258-1cb6-4208-9944-f45d48854679,Lacey James,C,81,240.0,1996-07-12,Northern Illinois
+9acd7af1-6d3c-4f4f-b674-fc20950be403,Chucky Hepburn,G,74,190.0,2003-02-09,Louisville
+ca96ae4e-14b8-43e9-8165-4d4ebc825140,Olivier Sarr,C,82,240.0,1999-02-20,Kentucky 
+d43dd68b-beba-4461-a568-6db53fae0638,AJ Hoggard,G,76,220.0,,Vanderbilt
+e57c27de-3ee1-472d-8556-48d28e680d2f,JP Pegues,G,74,180.0,,Auburn
+21505479-d887-42f6-956a-3da2b3535374,Lahat Thioune,F,82,224.0,1999-11-09,South Dakota
+24553349-818d-4624-a903-bd29e9d4c4c3,Jean-Jacques Boissy,G,72,,2000-01-28,
+43223bcf-ba6b-46ca-88b5-7dd2b44930ce,Ruben Nembhard Jr.,G,76,200.0,1999-03-22,TCU
+4a235821-ca5e-4142-83d5-d8de098953be,Caleb Grill,G,75,205.0,,Missouri
+87d26519-e815-4623-8dba-88bc7fc66aef,Noa Essengue,F,80,200.0,2006-12-18,
+967dc515-c7a6-437d-af5c-60b59423cb27,Olin Carter III,G,75,190.0,1996-11-12,San Diego
+9ddfa81d-d330-4036-81f9-9205789365a6,Lachlan Olbrich,F,81,230.0,2003-12-30,
+b285e099-73ca-4c5d-a790-cb8c78e8f850,Giorgi Bezhanishvili,F,81,245.0,1998-11-16,Illinois
+ba01bdf5-77ba-4fd4-bfd8-cd708cd9ef01,Mouhamadou Gueye,F,81,210.0,1998-07-06,Pittsburgh
+c5acbf67-df7e-4797-9efa-f779a945c2db,Trentyn Flowers,F,81,185.0,2005-03-08,Louisville
+ccd2813b-d941-4d34-bd7a-3381e59c06c0,Emanuel Miller,F,79,215.0,2000-06-19,TCU
+d676ed29-23f6-495b-bcd4-bc556987abd0,Ryan Woolridge,G,75,175.0,1996-11-16,Gonzaga
+e85f77f0-bf0f-4862-9354-a0b310586481,Kevin Knox II,F,80,215.0,1999-08-11,Kentucky
+f74d503a-9cdf-45ea-bba2-fdcf6ecfa3d3,Wooga Poplar,F,77,197.0,2003-01-05,Villanova
+08b63fc1-b0ef-4fae-93cc-5aa0f9b9e285,Quincy Olivari,G,75,200.0,2001-05-27,Xavier
+174ce3ba-0d2a-4b32-9e9a-1476ed36b6b5,Dawson Garcia,F,81,235.0,2001-09-20,Minnesota
+223d4cc2-dd8f-4933-b31d-88836c116d2b,Brian Taylor,F,78,220.0,2001-09-04,Central Michigan
+42b890c9-244e-45c9-a803-a155f8bd7cd6,Brice Williams,G-F,77,214.0,2001-07-05,Nebraska
+471354b7-c548-4344-9290-0d26601daf77,Symir Torrence,G,75,200.0,2001-06-02,Binghamton
+4743349c-5bf1-4575-996d-6e7c35648d40,Daniss Jenkins,G,77,165.0,2001-08-17,St. John
+4e51d9b7-e803-4842-b83b-59934938fab7,Feron Hunt,F,80,195.0,1999-07-05,SMU
+539937df-f480-4c25-8134-bb0fecc319e8,Tolu Smith III,F,83,245.0,2000-01-26,Washington State
+63ffc37d-9c49-4906-b8ae-9c9a4746c5e1,Jaden Akins,G,76,195.0,2003-02-25,Michigan State
+64f14595-4819-4563-96de-6848d266454d,John Ukomadu,F,79,195.0,2001-10-30,Eastern Kentucky
+65ad5718-0c7d-46b0-86ff-f7d58a125d75,Trae Hannibal,G,74,221.0,2001-02-13,LSU
+6d0b9fa9-af04-4d24-adcd-65f6fff4e9a9,Ray Williams Jr.,G-F,77,205.0,2002-06-27,Wayne State (MI)
+80642cb5-85cd-4981-9754-baa96e168f6e,Jason Hubbard,F,79,209.0,,Taylor
+9ddd3606-8cab-42a8-800b-16bce191c3e8,Charles Bediako,C,84,225.0,2002-03-10,Alabama
+ba834ffe-d308-4c45-a884-3f57cdee8b7e,Matthew Moncrieffe,F,80,214.0,2001-03-22,Seattle
+c3a2632e-21a2-45ab-a497-47939eb3ee53,Colby Jones,G,78,207.0,2002-05-28,Xavier
+c947664c-f286-45b6-b12e-8c7018146b6f,Ray Harrison,G,76,190.0,2002-03-02,Grand Canyon
+d6287644-8a99-4690-833e-d54b76495720,O'Mar Stanley,C,80,240.0,,Boise State
+0ed88d0d-05a2-4f15-bacc-f063ad26842a,Kaiden Rice,F,79,215.0,1999-06-09,Georgetown
+174aebae-9a66-4e7d-a571-84677d847767,Kevin McCullar Jr.,G,78,210.0,2001-03-15,Kansas
+4c97c8ae-487c-4d3d-a2c3-5178528a0ee2,Jamal Bey,G,78,210.0,1999-09-05,Washington
+533db993-7b47-4b72-808b-87b7b13615fa,T.J. Warren,F,80,220.0,1993-09-05,North Carolina State
+723388d2-c986-4e17-9fd2-26b0e433eff7,Trey Jemison III,C,82,260.0,1999-11-28,UAB
+8abddf04-a808-450b-99b8-cfb62a6dbeae,Jordan Tucker,F,79,210.0,1998-04-03,Butler
+9f0b3c44-7c6c-4167-8b3b-279e06661d8b,Myles Burns,F,78,210.0,2000-02-12,Ole Miss
+a13cb61f-223c-4b04-b1eb-1abe652d945c,Tosan Evbuomwan,F,79,217.0,2001-02-16,Princeton
+a27a5838-31f8-4f60-8309-49281163821d,MarJon Beauchamp,F,79,199.0,2001-10-12,
+a3d77759-be74-4651-9940-0ddcbdbc2188,Alex O'Connell,G,78,185.0,1999-06-02,Creighton
+06523076-6169-4b04-a560-fad5d465774c,Samson Johnson,C,82,225.0,2002-07-28,Connecticut
+0cffa5d9-a160-428b-a390-5fbe6dd22d7f,RJ Felton,G,75,200.0,2002-05-28,East Carolina
+12c1ec77-3c6e-41ea-a369-5249593d895d,Kyle Guy,G,73,167.0,1997-08-11,Virginia
+14631d38-5423-490b-8138-f3568d42b51e,Ahmaad Rorie,G,73,173.0,1995-09-15,Montana
+1f225112-0e11-43c5-84b0-14b06568ce5d,Gabe McGlothan,F,79,235.0,1999-03-03,Grand Canyon
+26f7ec30-5a6c-4019-bab6-01f5658acd2c,Ray Spalding,F,81,225.0,1997-03-11,Louisville
+34d9ca1b-5076-418d-81af-e5940a3b22b7,Ben Coupet Jr.,F,79,185.0,1998-01-25,Southern Illinois
+5ab7e43d-b88d-4cbe-8a9c-32b9a728718b,Issac McBride,G,73,173.0,2000-12-20,Oral Roberts
+a1481399-2b4b-4876-bf1c-089e60f659c0,Quenton Jackson,G,77,173.0,1998-09-15,Texas A&M
+ae0f7db9-3c58-4ff4-a221-e475384c89bf,Ithiel Horton,G,77,200.0,2000-06-26,Texas
+ba1f962d-ad91-4fe4-a7be-2375585af17e,Jalen Slawson,F,79,215.0,1999-10-22,Furman
+c03c89a0-6b78-4a1f-a9a3-0f5aacab1523,M.J. Iraldi,G,78,190.0,,Nova Southeastern (FL)
+c755a003-ff4f-44a9-a2cc-dae061387014,Cameron Hildreth,G,76,195.0,2002-09-18,Wake Forest
+d92d5542-8f7e-46b7-82fb-e0a77047c966,Taelon Peter,G,76,210.0,2002-02-27,Liberty
+dc0a824b-442b-40f0-bee2-8bc605a0abd1,DaJuan Gordon,G,76,190.0,2001-01-10,Texas-Arlington
+de8515df-08dd-4549-8ff6-16bdc0e4d876,RayJ Dennis,G,74,180.0,2001-03-30,Baylor
+e27c3dea-5462-477a-ad37-24d70e7167c2,Steven Ashworth,G,73,170.0,2000-05-01,Creighton
+f39b97d4-be73-447d-bdd4-1c816a73d92c,Sterling Manley,C,83,250.0,1998-12-18,North Carolina
+0723db91-9f17-4e36-ae72-d2873411c7cf,Vance Jackson,F,81,230.0,1997-08-20,East Carolina
+0853e296-9626-4068-8727-71e0927d0b97,Max Shulga,G,76,210.0,2002-06-25,VCU
+1a203113-7026-48b6-9f0b-6fa6ff2df646,RJ Luis Jr.,F,78,215.0,2002-11-27,St. John
+1cda8bbe-b118-4619-92e0-eb5e3c357b1b,Rahsool Diggins,G,74,185.0,2002-03-27,Massachusetts
+4de2a8d1-e268-4a48-925b-90c85ff33f49,Nicolas Timberlake,G,76,195.0,1998-08-18,Kansas
+633ee0a1-a649-4f0b-8abb-91608eb926e4,Ron Harper Jr.,G-F,77,233.0,2000-04-12,Rutgers
+6ce7720a-5939-43a7-a68c-209ef2542548,Hayden Gray,G,76,190.0,2003-05-11,UC San Diego
+6e13fea5-4d85-4628-9cde-7c7acf1abe78,Aaron Scott,F,79,200.0,2003-07-11,St. John's
+78e6d5a5-7c3b-46d1-b463-a075d521f886,Jalen Bridges,F,79,225.0,2001-05-14,Baylor
+7c320c53-756f-478f-a243-c7b20e8f6bec,Stefan Todorovic,F,80,209.0,2002-12-04,Pepperdine
+a86a800c-4a2e-4f9e-b8ce-03d14e09c039,Kameron Warrens,G,77,205.0,2000-02-22,University of Mary Marauders
+ab1c9fa4-994a-4d11-a273-bf20e7131804,D'Maurian Williams,G,75,195.0,2001-07-03,High Point
+b481b985-1979-408e-b508-4c7a3336d2ef,Omar El-Sheikh,F,80,218.0,1998-05-14,Arkansas State
+bb32e4d8-dce4-47d5-98fa-86556269044d,Makhi Mitchell,C,82,240.0,2000-01-31,Arkansas
+e0d4ee76-04a2-4a72-a9d5-dbd9ee8eb6f8,Kendall Brown,G,78,205.0,2003-05-11,Baylor
+e1cf7ef1-b7cb-49ea-95a0-1c4aee52f41f,Amari Williams,F-C,83,250.0,2002-01-28,Kentucky
+e51ebcfd-f613-402f-9fa4-ac4f12284950,Hason Ward,F,81,200.0,2000-09-24,Iowa State
+eee6c6f9-4f7d-4b13-8c6a-609c64756fc8,Wendell Moore Jr.,G,77,215.0,2001-09-18,Duke
+0cf40ad2-460e-4326-86e6-c327daab4132,Sam Hines Jr.,G,78,220.0,2002-03-26,Southeastern Louisiana
+18afd544-53da-4fa8-a53d-551280181f19,Marcus Bagley,F,78,217.0,2001-10-23,Arizona State
+1a034adf-509f-43c3-a151-f5c7dd232f63,Jaylen Martin,G,78,216.0,2004-01-28,
+1df272f2-60ef-4011-8a85-85852a785c63,Cam Young,G-F,79,210.0,,East Stroudsburg
+348ea11e-d3c8-4926-af4f-c7aae0ebf894,Igor Milicic Jr.,F,82,225.0,2002-08-27,Tennessee
+520da247-b643-4953-be85-89bdd8420fc9,Collin Moore,G,76,205.0,2001-05-10,Grand Canyon
+66d41b6e-051a-47ab-9a4d-5e8a5ec53032,Emoni Bates,F,80,170.0,2004-01-28,Eastern Michigan
+66efd625-1d25-4745-90cc-9987a6823795,DeAndre Williams,F,81,205.0,1996-10-04,Memphis
+7b539a1f-6d6e-47e3-8251-799d346e90a0,Malcolm Hill,F,78,220.0,1995-10-26,Illinois
+90f9ca95-1087-4d78-8d49-a651df568180,Dominick Barlow,F,81,215.0,2003-05-26,
+967ab4b0-b6c6-4f4c-8cb9-0c6fa74d0e21,Aminu Mohammed,G,77,210.0,2001-12-15,Georgetown
+b553254f-aaf1-4b46-885a-8f2bfae93ac2,Saint Thomas,F,79,235.0,2003-05-01,USC
+b707d9b2-f893-4ef2-a27b-777b0aa7b57d,Kennedy Chandler,G,71,170.0,2002-09-16,Tennessee
+c379dde1-2546-421d-a53e-04e07ae44cbb,Jabari Walker,F,79,227.0,2002-07-30,Colorado
+c68d568d-da2f-4e1c-97bd-008657013a62,Hunter Sallis,G,77,185.0,2003-03-06,Wake
+deec0861-0372-4db6-b8e1-4601ac4a80f2,Dwayne Cohill,G,74,180.0,2000-01-19,Southeastern Louisiana
+1dcdb0bf-d3c9-4ddc-ade4-b894f88400fe,Eli John Ndiaye,F,80,209.0,2004-06-26,
+4068c313-d8a1-4415-a9a0-2e3f84e7d751,Kobe Johnson,G,78,200.0,2003-01-15,UCLA
+59eb98bc-eabe-458b-a9bb-22b4182e79e4,David Singleton,G,76,210.0,1998-10-27,UCLA
+61c9cec6-fa0e-4534-8893-aac7e3218f5f,Nikola Đurišić,G,80,214.0,2004-02-23,
+6bffab04-cf7e-4da8-8f0b-672de22ef71c,Tyrin Lawrence,G,76,200.0,2000-11-01,Georgia
+71135118-a7c8-4eb9-a279-472c98522193,Tyler Polley,F,80,,1999-04-07,UConn
+8726a8b2-f60f-49ee-b536-d6e27fee71cf,Lok Wur,F,81,210.0,2000-12-12,Grand Canyon
+9cd6cc20-0279-43aa-89cf-e65f2f45ffcd,Jacob Toppin,F,81,200.0,2000-05-08,Kentucky
+9e1b8a2c-bb4d-4d43-9869-757a34facb2e,Javan Johnson,F,78,192.0,1999-01-05,DePaul
+a6853750-9f58-4146-a11b-e427e9aca503,Basheer Jihad,F,81,220.0,2000-01-01,Arizona State
+a78ff9d3-6a60-49bc-977f-b30b941dcdc3,MJ Walker,G,77,213.0,1998-03-28,Florida State
+aede7fbc-006a-4df0-9abe-c1b890cb4925,Seth Maxwell,C,84,235.0,1998-11-21,Indiana Wesleyan
+cb199447-164d-4240-bea2-105524f20287,N'Faly Dante,C,83,230.0,2001-10-19,Oregon
+dd3f28d2-f536-4ce1-b72a-bcbce5e036b0,Deivon Smith,G,72,175.0,2002-03-08,St. John's
+ef73549e-8287-48eb-a14b-d209e2cd34cb,Dwight Murray Jr.,G,72,180.0,2000-01-31,Rider
+fb010a95-230f-453c-af08-17c7ae63db6b,Caleb Houstan,G,80,205.0,2003-01-09,Michigan
+17644e96-472d-48de-985a-043120e1e852,T.J. Weeks Jr.,G,76,190.0,2000-03-15,Rider
+1abe59cd-3123-4f8e-81f8-0dc18fe4d990,Craig Randall II,G,76,185.0,1996-04-22,Tennessee-Martin
+2fae5cd4-51be-467d-a000-91ff00a599c6,Stephen Thompson,G,76,185.0,1997-03-23,Oregon State
+451cbc59-6f73-4035-983f-ea7ea363e8df,Kaden Anderson,F,80,220.0,1999-07-20,Point Loma
+4609d426-343d-4ed7-bdf4-c6a5536a3ce4,Philip Alston,F,77,235.0,2001-08-07,
+5d42cf8b-3e79-49db-b122-743e4b3fb554,Mark Sears,G,72,185.0,2002-12-19,Alabama
+798e5a1d-f22a-49c4-94f9-a97adf1af592,Alex Antetokounmpo,F,80,214.0,2000-08-26,
+89c7cd33-6143-48dd-82c4-ccbfed25ddaa,Anthony Tarke,G,78,220.0,1998-05-27,Coppin State
+8d794d32-a27e-4744-b622-04d1d549c77e,Pete Nance,F,81,225.0,2000-02-19,North Carolina
+9bad2133-ed14-46b4-841b-b637840d1b6b,Onno Steger,F,77,205.0,1998-02-22,Western Carolina
+b815068b-e959-4cd8-84b2-a2020568afc4,Johnny Davis,G,76,195.0,2002-02-27,Wisconsin
+d79e2b2d-1f97-4923-b89b-3dc5eb5be0bf,Kira Lewis Jr.,G,73,170.0,2001-04-06,Alabama
+dff3fef0-a53b-4c37-beb3-c29f234f55b9,Jeremiah Tilmon,C,82,260.0,1998-11-25,Missouri
+f6c18684-29d4-419e-a4d6-15469fdb789f,John Butler Jr.,C,84,190.0,2002-12-04,Florida State
+f95f6570-6d59-4ee6-b00c-a9b898fbf517,Cormac Ryan,G,77,195.0,1998-10-26,North Carolina
+fbb7fcff-841a-498f-9670-32d0bd2b75f3,Jordan Ivy-Curry,G,75,177.0,2002-03-14,UCF
+2ef7106c-f431-4ec8-9d65-3771d1c54d43,Grant Nelson,F,84,215.0,2002-03-18,Alabama
+4c88c36c-b715-48ff-8a59-64fe2ba915b1,David Muoka,C-F,82,235.0,2000-12-14,UNLV
+53c33ff2-f48c-41a8-9942-63bba21fc1ff,Tyson Etienne,G,72,200.0,1999-09-17,Wichita State
+5a3fe78a-bb8b-49fd-b24e-83535aaceebe,Malachi Smith,G,76,205.0,1999-12-06,Gonzaga
+686bbb81-0e9f-46bf-aad9-0034416d48d8,Fanbo Zeng,F,83,199.0,2003-01-11,
+81c8022c-34c2-46c1-9315-e33338e50968,Jay Scrubb,G,76,220.0,2000-09-01,John A. Logan College (IL)
+82be8a97-3d7d-4f7f-b97d-9506d040717b,E.J. Liddell,F,78,240.0,2000-12-18,Ohio State
+83c7d091-84a7-460f-9a91-c635d78ba69f,Yuri Collins,G,72,190.0,2001-03-07,Saint Louis
+8eea2c63-baa8-4beb-bbb9-47babb4aaa3e,Nate Williams,G,77,205.0,1999-02-12,Buffalo
+97aaa7be-ba6d-44f6-95c6-ecaf02d67218,Terry Roberts,G,75,180.0,2000-09-07,Georgia
+9a2481ed-4a7f-44b7-bd5b-b7e4d52206d7,Hunter Cattoor,G,75,200.0,2000-11-17,Virginia Tech
+c6adeed5-dc6a-4d8f-a10e-d74f5c4abfae,Tre King,F,79,230.0,1999-10-01,Iowa State
+d984c336-f3b4-46f1-ad14-4f0f7323a961,Trevon Scott,F,80,225.0,1996-11-25,Cincinnati 
+e474ef36-9564-45ac-9d32-423c618e11b3,Dre Davis,G,78,215.0,2001-08-23,Ole Miss
+e47da487-111d-4de4-a320-fcb221932dcb,ShawnDre Jones,G,72,170.0,1994-11-18,Richmond
+e7197e7a-bf56-4a0c-be4b-757caf56a3c8,Kyle Rose,G,76,192.0,2000-01-12,Fordham
+f553edcd-aff5-4f26-942d-4080b0a3505e,Chaunce Jenkins,G,76,185.0,,Seton Hall
+04d1a367-863c-464c-9a6b-d667c481c7c1,Garrison Brooks,C,82,240.0,1999-06-29,Mississippi State
+0828de77-39fb-4db9-b2b4-68f537d4e53f,Jaden Springer,G,76,202.0,2002-09-25,Tennessee
+260d4077-9774-44e3-b8f6-558ae0ab3afb,Chase Hunter,G,76,202.0,2001-04-08,Clemson
+34ca1165-b7a2-4557-b6de-4d73c22775c2,Christian Shumate,F,78,213.0,2002-07-24,McNeese State
+3966949b-9437-4142-a834-46d6a6d78588,Trhae Mitchell,G,78,195.0,1997-08-19,South Alabama
+766a0f03-1f9c-4252-8f28-ed7ccac211fe,Jalon Moore,F,78,211.0,2003-04-10,Oklahoma
+8c8c9ff2-bcd6-4b08-bcbc-7a55a942b160,Giddy Potts,G,74,220.0,1995-08-08,Middle Tennessee
+9eefa090-5f1f-46f4-a6f3-8f40539ca571,Hunter Dickinson,C,85,255.0,2000-11-25,Kansas
+ab24918f-3367-446c-a34b-15e49ee754d6,D.J. Carton,G,75,200.0,2000-08-05,Marquette
+c923ac66-cb9a-4800-b1c4-6b4619452aac,Bryce McGowens,G,78,190.0,2002-11-08,Nebraska
+c99c8e31-fc88-4f89-932d-52d134bc856d,Josh Oduro,C,81,240.0,2000-10-14,Providence
+d437b53a-8571-4c5c-ac80-9e248ada2231,J.Z. Zaher,G,72,165.0,2004-07-01,Bowling Green
+e344d180-4202-4301-988d-2951a2b07440,Will Brown,C,84,220.0,1997-07-29,Fayetteville State
+ee67ee67-61da-46c4-bfbb-680482a9b3f2,Keion Brooks Jr.,F,79,210.0,2000-07-07,Washington
+ef527359-ca27-404b-8840-fb1b2418b8ba,Trey Alexander,G,77,185.0,2003-05-02,Creighton
+fdb9ea06-c94e-4e00-9357-77058c6b7968,Everette Hammond,G,75,185.0,1999-05-14,UMass Lowell
+27403427-4b94-4336-8b1a-6c6035b7be1c,Spencer Jones,F,79,225.0,2001-06-14,Stanford
+52fd5d0f-a975-4753-bd72-c8078e1b9f04,Curtis Jones,G,76,195.0,2001-10-04,Iowa State
+57d0bf3f-9a55-4e21-b163-41e64131cb76,Joey Baker,F,79,205.0,2000-09-13,Michigan
+85a5c017-9eca-4059-b015-a24b80bb0e00,James Akinjo,G,73,190.0,2000-11-27,Baylor
+89dc6747-b58a-4983-8980-946d2ca22263,Deante Johnson,F,81,210.0,1998-01-01,Cleveland State
+8aa22f38-a266-4967-a66a-0d7e14788e49,Amauri Hardy,G,73,200.0,1998-04-30,Oregon
+925d5761-3341-4ebe-a804-27230da2f8aa,Grayson Murphy,G,74,190.0,1999-02-04,Belmont
+cc1f35b1-f38e-432f-8399-204c53160289,Tamar Bates,G,77,195.0,2003-02-21,Missouri
+d5f1b357-a398-48ba-9591-981376914870,DaRon Holmes II,F,81,225.0,2002-08-15,Dayton
+0e3419b6-8d1e-494c-ae97-b8c5ab0f2a52,Akoldah Gak,F,83,225.0,2002-07-12,Illawarra
+16456020-eda1-4893-ac8f-3f297f24de95,Jonathan Pierre,F,81,210.0,2003-04-20,Belmont 
+452144eb-ad6a-4c22-9277-662a30e3e11f,Leaky Black,F,78,209.0,1999-06-14,North Carolina
+60b42c4f-a2c6-4e0b-b3bf-cab0ae77ad66,Tyler Smith,F,81,224.0,2004-11-02,
+6b20d2b2-5e0d-4158-ba87-7d5e84a4f09e,Christopher Mantis,F,79,185.0,2000-01-01,Maine
+97142b9d-8c0a-492a-a424-bfb08b264385,Sharife Cooper,G,72,176.0,2001-06-11,Auburn
+a6ace99c-e7c3-4392-8bec-ba23b5f31d6c,Nolan Hickman,G,74,190.0,2003-05-07,Gonzaga
+a79f12bd-27ed-4128-9116-a4f4ce752307,Alondes Williams,G,76,210.0,1999-06-19,Wake Forest
+aa5acb4f-c777-4bbc-b564-887cb949b1e2,Keshon Gilbert,G,76,200.0,2003-06-30,Iowa State
+c4c92fb4-233e-43ff-a418-862b3a93901d,Skal Labissiere,F-C,82,235.0,1996-03-18,Kentucky
+e9b46446-3fc3-4ef6-b14f-b452ab54f146,Jamir Watkins,F,78,210.0,2001-07-06,Florida State
+ec577c6d-6849-40d3-85bc-cb61c4103b81,Kadary Richmond,G,78,205.0,2001-08-25,St. John's
+ee12f7c9-a000-4b89-8a29-e2821b115d20,Tristan Vukcevic,F,84,220.0,2003-03-11,
+07419dfb-2947-4a09-ae47-1b1e2c7574a9,Killian Hayes,G,77,195.0,2001-07-27,
+2edb28ca-90ec-459f-87c9-4ae30eddec74,Darius Brown II,G,74,192.0,1999-07-28,Utah State
+3e8febf4-f2d1-4980-87d7-b8a22998137d,Warith Alatishe,F,79,200.0,2000-01-22,Oregon State
+4aab77b0-2010-4abb-9c79-3966113fbba8,Nae'Qwan Tomlin,F,82,210.0,2000-12-19,Memphis
+7a192e89-4e84-4550-8de2-bde80d75fbc2,Luke Travers,G,79,207.0,2001-09-03,
+81cb0257-cdb9-4846-b541-f855c971066d,Miller Kopp,F,79,220.0,1998-11-24,Indiana
+82dcd86d-dc4d-46aa-9220-7176cf979c3b,Jaxson Robinson,G,79,190.0,2002-12-03,Kentucky
+86dc6770-adb7-4b4f-89fb-127092f7f6ee,Chris Livingston,F,78,220.0,2003-10-15,Kentucky
+97c477c5-f06c-407a-ae1f-a9db3d8515f9,Norchad Omier,F,77,248.0,2001-08-28,Baylor
+a705fde2-1958-4d6e-ad16-af4a02ff966c,Zeke Mayo,G,76,185.0,2002-12-18,Kansas
+c14a7d4e-d644-4cee-a91e-ea1b7e4f345b,Tristan Enaruna,F,80,220.0,2001-06-26,Cleveland State
+d43f5001-6bd7-49d6-ab0e-578e634e6163,Sean McNeil,G,76,205.0,1998-08-17,Ohio State
+e2329354-ca13-4ad4-b16f-8fb386f56115,Chaney Johnson,F,79,225.0,2002-06-20,Auburn
+f64ddf4c-402a-4a79-8ed5-4cd2bf2a9ac7,Javier Ezquerra,G,73,175.0,,Wagner
+04fa5a35-1c1c-4dea-8847-e75c9d6ce391,DJ Rodman,G-F,78,215.0,2001-04-25,USC
+09370bac-e18f-4fd6-a61a-683a3c123606,Keyontae Johnson,F,76,230.0,2000-05-24,Kansas State
+0b1e6c8b-c39c-43a9-aef2-3740b345b54e,Marcus Garrett,G,77,205.0,1998-11-09,Kansas
+134786db-90bd-4e00-93b0-ce0cff1b25dc,Josiah Allick,F,80,235.0,2001-06-02,Nebraska
+1739a4ca-084a-4537-9670-89b828c18349,Terrell Brown Jr.,G,75,175.0,1998-04-23,Washington
+1bc681bf-4645-46f2-af42-bcc87b4ca091,Drew Peterson,F,81,205.0,1999-11-09,USC
+32129c9b-6db8-4787-a768-b21b7e8737f5,Jaylen Sims,G,78,210.0,1998-12-11,UNC Wilmington
+469fc014-4dc9-4015-b456-b4df75f3684f,Isaih Moore,F,82,197.0,2000-08-30,Fresno State
+5a999dba-1b4e-45a4-ba6c-2bda7a0e580a,KJ Simpson,G,72,187.0,2002-08-08,Colorado
+5d8636af-615d-4811-80d5-258a184e6971,Brandon Slater,F,79,220.0,1999-09-14,Villanova
+63fc7907-6817-4ce0-982e-62aec54a0cab,Eric Dixon,F,78,255.0,2001-01-26,Villanova
+826db458-68dc-4b84-8604-ee70083477b8,Ibou Badji,C,82,240.0,2002-10-13,
+d1315319-4751-42ea-88e6-0b707a4a08cb,Jonas Aidoo,C,83,240.0,,Arkansas
+d8450778-d9b4-425e-b33b-1e5040bcf89e,Antonio Reeves,G,77,205.0,2000-11-20,Kentucky
+e97ddcf0-32a1-44b7-9ef6-5fd30f5233c2,Tidjane Salaün,F,81,207.0,2005-08-10,
