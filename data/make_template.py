@@ -1,6 +1,6 @@
 import pandas as pd
 
-players = pd.read_csv('../raw/gleague_players.csv')
+players = pd.read_csv('raw/gleague_players.csv')
 template = pd.DataFrame({
     'player_name': players['full_name'],
     'nba_team': '',
