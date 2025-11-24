@@ -1,4 +1,4 @@
-# 🏀 Next Up: Predicting NBA G-League Call-Ups
+# Next Up: Predicting NBA G-League Call-Ups
 
 Next Up is a data science project that explores the most influential factors behind NBA call-ups from the G-League. Beyond performance metrics, it incorporates contextual variables such as agency representation, team needs, player history, and injury-related opportunities.
 
@@ -25,7 +25,7 @@ The final deliverable is an interactive Streamlit web application that allows us
 
 - GitHub Repository: Documented codebase, organized data pipeline, and final cleaned scripts
 
-# 🗂️ Dataset / Data Sources
+# Dataset / Data Sources
 
 - G-League stats & rosters: SportsRadar API
 
@@ -35,7 +35,7 @@ The final deliverable is an interactive Streamlit web application that allows us
 
 - Optional context data: Team injury reports, roster shortages (Spotrac, media reports)
 
-# 🎯 Learning Goals
+# Learning Goals
 
 - Clean, merge, and engineer features from heterogeneous data sources
 
@@ -49,7 +49,7 @@ The final deliverable is an interactive Streamlit web application that allows us
 
 - Collaborate using GitHub for version control and project transparency
 
-# 🏀 Domain Background
+# Domain Background
 
 The path from the NBA G-League to the NBA is highly competitive and often unpredictable.
 This project uses data science to analyze how performance, context, and representation impact advancement.
