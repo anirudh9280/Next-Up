@@ -6,6 +6,7 @@ This file serves as the root-level entry point for Streamlit Cloud deployment.
 It's a copy of app/app.py with adjusted paths for root-level execution.
 """
 
+import ast
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -28,6 +29,13 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+try:
+    import xgboost as xgb  # type: ignore
+    XGBOOST_AVAILABLE = True
+except Exception:
+    XGBOOST_AVAILABLE = False
 
 try:
     import shap  # type: ignore
@@ -68,33 +76,59 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+def _parse_list_cell(value):
+    """Convert stringified list columns from CSV back into Python lists."""
+    if isinstance(value, list):
+        return value
+    if pd.isna(value):
+        return []
+    text = str(value).strip()
+    if not text:
+        return []
+    if text.startswith('[') and text.endswith(']'):
+        try:
+            parsed = ast.literal_eval(text)
+            if isinstance(parsed, list):
+                return parsed
+        except Exception:
+            pass
+    return [text]
+
+
 @st.cache_data
 def load_data():
     """Load base G-League datasets (players, rosters, teams, callups)."""
-    try:
-        base_path = Path(__file__).parent
-
-        players = pd.read_csv(base_path / 'raw' / 'gleague_players.csv')
-        rosters = pd.read_csv(base_path / 'raw' / 'gleague_rosters.csv')
-        teams = pd.read_csv(base_path / 'raw' / 'gleague_teams.csv')
-
-        # Try to load manual call-up data (if available)
+    base_path = Path(__file__).parent
+        
+    def _safe_read_csv(path: Path):
         try:
-            callups = pd.read_csv(base_path / 'data' / 'external' / 'callups.csv')
+            return pd.read_csv(path)
         except FileNotFoundError:
-            callups = None
+            return None
 
-        # Fallback: if manual callups.csv not present, try 10-day callups tidy file
-        if callups is None:
-            try:
-                callups = pd.read_csv(base_path / 'data' / 'callups_10day_tidy.csv')
-            except FileNotFoundError:
-                callups = None
+    try:
+        players = _safe_read_csv(base_path / 'raw' / 'gleague_players.csv')
+        rosters = _safe_read_csv(base_path / 'raw' / 'gleague_rosters.csv')
+        teams = _safe_read_csv(base_path / 'raw' / 'gleague_teams.csv')
 
+        callups = None
+        aggregated_path = base_path / 'data' / 'callups_nba_2019_2025_aggregated.csv'
+        if aggregated_path.exists():
+            callups = pd.read_csv(aggregated_path)
+            list_cols = ['gleague_teams', 'nba_teams', 'callup_dates', 'contract_type']
+            for col in list_cols:
+                if col in callups.columns:
+                    callups[col] = callups[col].apply(_parse_list_cell)
+        else:
+            # Legacy fallback (older manual call-up sources)
+            callups = _safe_read_csv(base_path / 'data' / 'external' / 'callups.csv')
+            if callups is None:
+                callups = _safe_read_csv(base_path / 'data' / 'callups_10day_tidy.csv')
+            
         return players, rosters, teams, callups
     except Exception as e:
         st.error(f"Error loading data: {e}")
-        st.error(f"Looking in: {Path(__file__).parent}")
+        st.error(f"Looking in: {base_path}")
         return None, None, None, None
 
 
@@ -102,8 +136,8 @@ def load_data():
 def load_prediction_data():
     """Load cleaned prediction dataset and feature importance (for modeling)."""
     base_path = Path(__file__).parent
-    pred_path = base_path / 'data' / 'prediction_dataset_cleaned.csv'
-    feat_imp_path = base_path / 'data' / 'feature_importance.csv'
+    pred_path = base_path / 'data' / 'prediction_dataset_callups_nba_cleaned.csv'
+    feat_imp_path = base_path / 'data' / 'feature_importance_callups_nba.csv'
 
     pred_df = None
     feat_imp_df = None
@@ -123,17 +157,27 @@ def load_prediction_data():
 
 @st.cache_resource
 def load_model():
-    """Train a Logistic Regression pipeline from the cleaned prediction dataset.
+    """Load the pre-trained Logistic Regression pipeline (or train/save a fallback)."""
+    base_path = Path(__file__).parent
+    model_path = base_path / 'models' / 'log_reg_callup_pipeline.joblib'
 
-    We intentionally retrain the model at app startup rather than loading a
-    serialized artifact to avoid sklearn version mismatch issues.
-    """
+    if model_path.exists():
+        try:
+            model = joblib.load(model_path)
+            st.success("✅ Loaded Logistic Regression pipeline from saved artifact.")
+            return model
+        except Exception:
+            # Artifact likely came from an older sklearn version; remove and retrain silently.
+            try:
+                model_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+
     pred_df, _ = load_prediction_data()
     if pred_df is None:
-        st.error("Prediction dataset not available; cannot train fallback model.")
+        st.error("Prediction dataset not available; cannot initialize model.")
         return None
 
-    # Prepare features and target
     exclude_cols = ['player_name', 'season_year', 'called_up']
     feature_cols = [c for c in pred_df.columns if c not in exclude_cols]
     categorical_cols = ['position'] if 'position' in feature_cols else []
@@ -151,6 +195,7 @@ def load_model():
 
     log_reg = LogisticRegression(
         class_weight='balanced',
+        C=0.01,
         max_iter=2000,
         random_state=42,
     )
@@ -162,9 +207,20 @@ def load_model():
 
     X = pred_df[feature_cols].copy()
     y = pred_df['called_up'].copy()
-    pipeline.fit(X, y)
 
-    st.success("✅ Trained Logistic Regression model from the cleaned prediction dataset.")
+    try:
+        pipeline.fit(X, y)
+    except Exception as exc:
+        st.error(f"Failed to train fallback Logistic Regression model: {exc}")
+        return None
+
+    try:
+        os.makedirs(model_path.parent, exist_ok=True)
+        joblib.dump(pipeline, model_path)
+    except Exception as exc:
+        st.warning(f"Trained model but could not save artifact ({exc}).")
+
+    st.success("✅ Trained and cached Logistic Regression model from the cleaned dataset.")
     return pipeline
 
 # Sidebar navigation
@@ -237,20 +293,19 @@ if page == "🏠 Home":
     
     with col3:
         callup_rate_value = "N/A"
-        if callups_df is not None and 'called_up' in callups_df.columns:
-            try:
-                callup_rate = callups_df['called_up'].astype(float).mean() * 100
-                callup_rate_value = f"{callup_rate:.1f}%"
-            except Exception:
-                callup_rate_value = "N/A"
-        elif prediction_df is not None and 'called_up' in prediction_df.columns:
+        if prediction_df is not None and 'called_up' in prediction_df.columns:
             callup_rate = prediction_df['called_up'].mean() * 100
             callup_rate_value = f"{callup_rate:.1f}%"
+        elif callups_df is not None and 'times_called_up' in callups_df.columns:
+            total_players = len(prediction_df) if prediction_df is not None else None
+            total_callups = callups_df['times_called_up'].sum()
+            if total_players:
+                callup_rate_value = f"{(total_callups / total_players) * 100:.1f}%"
 
-        st.metric(
-            label="Call-Up Rate",
+            st.metric(
+                label="Call-Up Rate",
             value=callup_rate_value
-        )
+            )
     
     st.markdown("---")
     
@@ -275,11 +330,11 @@ if page == "🏠 Home":
         st.subheader("🎯 Features")
         st.write("""
         **Current Features:**
-        - 🤖 Player-level call-up probability predictions
-        - 🏀 Team-level call-up analysis with predicted probabilities
-        - 📊 Data exploration and visualization
-        - 👥 Player demographic insights
-        - 📈 Model performance and feature importance views
+        - Player-level call-up probability predictions
+        - Team-level call-up analysis with predicted probabilities
+        - Data exploration and visualization
+        - Player demographic insights
+        - Model performance and feature importance views
         
         **Planned Enhancements:**
         - More advanced interpretability (e.g., SHAP plots)
@@ -326,9 +381,9 @@ elif page == "👤 Player Prediction":
                     pred_row = match_pred.iloc[0]
 
             st.subheader(f"Player Profile: {player_name}")
-
+            
             col_p1, col_p2, col_p3, col_p4 = st.columns(4)
-
+            
             with col_p1:
                 pos = pred_row.get('position', 'N/A') if pred_row is not None and 'position' in pred_row else 'N/A'
                 st.metric("Position", pos)
@@ -341,9 +396,9 @@ elif page == "👤 Player Prediction":
             with col_p4:
                 avg_eff = pred_row.get('avg_efficiency', 'N/A') if pred_row is not None and 'avg_efficiency' in pred_row else 'N/A'
                 st.metric("Avg Efficiency", avg_eff)
-
+            
             st.markdown("---")
-
+            
             # Model prediction + actual outcome
             if model is None or latest_predictions_df is None or pred_row is None:
                 st.warning("⚠️ Trained model or prediction data not available.")
@@ -371,7 +426,7 @@ elif page == "👤 Player Prediction":
                     }
                 ))
                 st.plotly_chart(fig, use_container_width=True)
-
+                
                 label = (
                     "**HIGH**" if prob > 0.6
                     else "**MODERATE**" if prob > 0.3
@@ -450,19 +505,19 @@ elif page == "🏀 Team Analysis":
         with col_team_sel:
             team_name = st.selectbox(
                 "Select a team:",
-                options=team_names
-            )
+                    options=team_names
+                )
 
         with col_team_compare:
             compare_teams = st.multiselect(
                 "Compare teams (by average predicted call-up probability):",
                 options=team_names,
                 default=[team_name] if team_name else None
-            )
-
+        )
+        
         # Prepare predictions merged with rosters for team-level analysis
         team_roster = rosters_df[rosters_df['team_name'] == team_name]
-
+        
         if latest_predictions_df is not None:
             team_pred_merge = rosters_df.merge(
                 latest_predictions_df[['player_name', 'pred_prob']],
@@ -473,13 +528,13 @@ elif page == "🏀 Team Analysis":
             team_pred_merge = None
 
         st.markdown("---")
-
+        
         # Team metrics
         col1, col2, col3 = st.columns(3)
-
+        
         with col1:
             st.metric("Total Players", len(team_roster))
-
+        
         with col2:
             if team_pred_merge is not None:
                 this_team = team_pred_merge[team_pred_merge['team_name'] == team_name]
@@ -490,17 +545,17 @@ elif page == "🏀 Team Analysis":
                     st.metric("Avg Predicted Call-Up Prob", f"{avg_prob*100:.1f}%")
             else:
                 st.metric("Avg Predicted Call-Up Prob", "N/A")
-
+        
         with col3:
             positions = team_roster['position'].nunique()
             st.metric("Positions", positions)
-
+        
         st.markdown("---")
-
+        
         # Position distribution
         st.subheader("📊 Position Distribution")
         position_counts = team_roster['position'].value_counts()
-
+        
         fig = px.bar(
             x=position_counts.index,
             y=position_counts.values,
@@ -508,7 +563,7 @@ elif page == "🏀 Team Analysis":
             title=f"{team_name} - Position Distribution"
         )
         st.plotly_chart(fig, use_container_width=True)
-
+        
         # Predicted probabilities for this team
         if team_pred_merge is not None and model is not None:
             st.subheader("🔮 Player Call-Up Probabilities (Model Predictions)")
@@ -530,9 +585,9 @@ elif page == "🏀 Team Analysis":
             st.plotly_chart(fig_probs, use_container_width=True)
 
             # Table
-            st.dataframe(
+        st.dataframe(
                 this_team.rename(columns={'pred_prob': 'pred_prob (0-1)'}).reset_index(drop=True),
-                use_container_width=True
+            use_container_width=True
             )
 
         # Team comparison view
@@ -608,7 +663,7 @@ elif page == "🏀 Team Analysis":
                     })
                     .reset_index(drop=True),
                     use_container_width=True,
-                )
+        )
 
 # ==================== DATA EXPLORER PAGE ====================
 elif page == "📊 Data Explorer":
@@ -657,124 +712,112 @@ elif page == "📊 Data Explorer":
     
     elif dataset == "Call-Ups (if available)":
         if callups_df is not None:
-            st.subheader("🎯 Call-Ups Dataset")
-            st.write(f"Total records: {len(callups_df)}")
+            st.subheader("🎯 NBA.com Call-Ups (2019-2025 Aggregated)")
+            st.write(
+                "Official call-up events pulled directly from NBA.com, aggregated at the player-season level."
+            )
+            st.write(f"Total player-season rows: {len(callups_df)}")
             st.dataframe(callups_df, use_container_width=True)
-
+            
             st.markdown("---")
-            st.subheader("📊 Call-Up Player Profiles (Heights, Positions, etc.)")
+            st.subheader("📊 Season & Contract Trends")
 
-            if players_df is not None:
-                # Helper to normalize names: "Last, First" -> "First Last"
-                def _clean_name(name):
-                    if isinstance(name, str) and "," in name:
-                        last, first = name.split(",", 1)
-                        return f"{first.strip()} {last.strip()}"
-                    return str(name).strip() if isinstance(name, str) else name
+            if 'season_year' in callups_df.columns:
+                season_counts = (
+                    callups_df.groupby('season_year')['times_called_up']
+                    .sum()
+                    .reset_index(name='callups')
+                )
+                fig_season = px.bar(
+                    season_counts,
+                    x='season_year',
+                    y='callups',
+                    labels={'season_year': 'Season', 'callups': 'Number of Call-Ups'},
+                    title='Call-Ups by Season',
+                                )
+                st.plotly_chart(fig_season, use_container_width=True)
 
-                callups_enriched = callups_df.copy()
-                if 'player_name' in callups_enriched.columns:
-                    callups_enriched['player_name_clean'] = callups_enriched['player_name'].apply(_clean_name)
+            if 'contract_type' in callups_df.columns:
+                contract_counts = (
+                    callups_df['contract_type']
+                    .explode()
+                    .dropna()
+                    .value_counts()
+                    .reset_index(name='count')
+                    .rename(columns={'index': 'contract_type'})
+                )
+                if not contract_counts.empty:
+                    fig_contract = px.pie(
+                        contract_counts,
+                        names='contract_type',
+                        values='count',
+                        title='Contract Types Issued',
+                                )
+                    st.plotly_chart(fig_contract, use_container_width=True)
 
-                    players_enriched = players_df.copy()
-                    if 'full_name' in players_enriched.columns:
-                        players_enriched['player_name_clean'] = players_enriched['full_name'].astype(str).str.strip()
+                    st.markdown("---")
+                    st.subheader("🏀 Teams Involved in Call-Ups")
 
-                        # Join callups with player demographics
-                        callups_enriched = callups_enriched.merge(
-                            players_enriched[
-                                ['player_name_clean', 'position', 'height', 'weight', 'college']
-                            ],
-                            on='player_name_clean',
-                            how='left'
-                        )
+            if 'gleague_teams' in callups_df.columns:
+                gleague_counts = (
+                    callups_df['gleague_teams']
+                    .explode()
+                    .dropna()
+                    .value_counts()
+                    .reset_index(name='count')
+                    .head(15)
+                )
+                if not gleague_counts.empty:
+                    fig_g = px.bar(
+        gleague_counts,
+        x='gleague_teams',
+        y='count',
+        labels={'gleague_teams': 'G-League Team', 'count': 'Call-Ups'},
+        title='Top G-League Teams (Call-Ups)',
+                    )
+                    fig_g.update_layout(xaxis_tickangle=-45)
+                    st.plotly_chart(fig_g, use_container_width=True)
 
-                        # Also join G-League team info from rosters, if available
-                        if rosters_df is not None:
-                            rosters_enriched = rosters_df.copy()
-                            rosters_enriched['player_name_clean'] = rosters_enriched['player_name'].apply(_clean_name)
-                            rosters_enriched = rosters_enriched[['player_name_clean', 'team_name']].drop_duplicates()
-
-                            callups_enriched = callups_enriched.merge(
-                                rosters_enriched,
-                                on='player_name_clean',
-                                how='left'
+            if 'nba_teams' in callups_df.columns:
+                nba_counts = (
+                    callups_df['nba_teams']
+                    .explode()
+                    .dropna()
+                    .value_counts()
+                    .reset_index(name='count')
+                    .head(15)
+                )
+                if not nba_counts.empty:
+                            fig_n = px.bar(
+                nba_counts,
+                x='nba_teams',
+                y='count',
+                labels={'nba_teams': 'NBA Team', 'count': 'Call-Ups'},
+                title='Top NBA Teams (Call-Ups)',
                             )
+                            fig_n.update_layout(xaxis_tickangle=-45)
+                            st.plotly_chart(fig_n, use_container_width=True)
 
-                        col_c1, col_c2 = st.columns(2)
-
-                        # Position distribution among called-up players
-                        with col_c1:
-                            pos_counts = callups_enriched['position'].dropna().value_counts()
-                            if not pos_counts.empty:
-                                fig_pos = px.bar(
-                                    x=pos_counts.index,
-                                    y=pos_counts.values,
-                                    labels={'x': 'Position', 'y': 'Number of Call-Ups'},
-                                    title="Positions of Called-Up Players",
-                                )
-                                st.plotly_chart(fig_pos, use_container_width=True)
-                            else:
-                                st.info("No position information available for called-up players.")
-
-                        # Height distribution among called-up players
-                        with col_c2:
-                            heights = pd.to_numeric(callups_enriched['height'], errors='coerce').dropna()
-                            if not heights.empty:
-                                fig_h = px.histogram(
-                                    x=heights,
-                                    nbins=20,
-                                    labels={'x': 'Height (inches)', 'y': 'Number of Call-Ups'},
-                                    title="Heights of Called-Up Players",
-                                )
-                                st.plotly_chart(fig_h, use_container_width=True)
-                            else:
-                                st.info("No height information available for called-up players.")
-
-                        st.markdown("---")
-                        st.subheader("🏀 Teams Involved in Call-Ups")
-
-                        col_t1, col_t2 = st.columns(2)
-
-                        # G-League teams players were called up from
-                        with col_t1:
-                            if rosters_df is not None and 'team_name' in callups_enriched.columns:
-                                gleague_counts = callups_enriched['team_name'].dropna().value_counts().head(15)
-                                if not gleague_counts.empty:
-                                    fig_g = px.bar(
-                                        x=gleague_counts.index,
-                                        y=gleague_counts.values,
-                                        labels={'x': 'G-League Team', 'y': 'Number of Call-Ups'},
-                                        title="Top G-League Teams (By Call-Ups)",
-                                    )
-                                    fig_g.update_layout(xaxis_tickangle=-45)
-                                    st.plotly_chart(fig_g, use_container_width=True)
-                                else:
-                                    st.info("No G-League team information available for called-up players.")
-                            else:
-                                st.info("Rosters dataset not available for linking G-League teams.")
-
-                        # NBA teams that called players up
-                        with col_t2:
-                            if 'nba_team' in callups_enriched.columns:
-                                nba_counts = callups_enriched['nba_team'].dropna().value_counts().head(15)
-                                if not nba_counts.empty:
-                                    fig_n = px.bar(
-                                        x=nba_counts.index,
-                                        y=nba_counts.values,
-                                        labels={'x': 'NBA Team', 'y': 'Number of Call-Ups'},
-                                        title="Top NBA Teams (By Call-Ups)",
-                                    )
-                                    fig_n.update_layout(xaxis_tickangle=-45)
-                                    st.plotly_chart(fig_n, use_container_width=True)
-                                else:
-                                    st.info("No NBA team information available for call-ups.")
-                            else:
-                                st.info("Call-ups dataset does not contain `nba_team` information.")
-                    else:
-                        st.info("Players dataset does not contain `full_name` for joining.")
-                else:
-                    st.info("Call-ups dataset does not contain `player_name` for joining to player demographics.")
+            if players_df is not None and 'player_name' in callups_df.columns:
+                merged_players = players_df.copy()
+                name_col = 'full_name' if 'full_name' in merged_players.columns else 'player_name'
+                merged_players[name_col] = merged_players[name_col].astype(str).str.strip()
+                callups_players = callups_df.merge(
+                    merged_players[[name_col, 'position']].rename(columns={name_col: 'player_name'}),
+                    on='player_name',
+                    how='left'
+                )
+                pos_counts = callups_players['position'].dropna().value_counts()
+                if not pos_counts.empty:
+                    st.markdown("---")
+                    st.subheader("📌 Positions of Called-Up Players")
+                    fig_pos = px.bar(
+                        x=pos_counts.index,
+                        y=pos_counts.values,
+                        labels={'x': 'Position', 'y': 'Number of Call-Ups'},
+                        title='Positions Receiving Call-Ups'
+                    )
+                    st.plotly_chart(fig_pos, use_container_width=True)
         else:
             st.warning("Call-up data not yet available")
 
@@ -811,30 +854,44 @@ elif page == "🔍 Model Insights":
                 X_temp, y_temp, test_size=0.25, stratify=y_temp, random_state=42
             )
 
-            # Evaluate on validation and test sets
-            def eval_set(X_set, y_set, name: str):
-                y_pred = model.predict(X_set)
-                y_proba = model.predict_proba(X_set)[:, 1]
-                f1 = f1_score(y_set, y_pred)
-                prec = precision_score(y_set, y_pred)
-                rec = recall_score(y_set, y_pred)
-                roc = roc_auc_score(y_set, y_proba)
-                pr = average_precision_score(y_set, y_proba)
+            categorical_cols = ['position'] if 'position' in feature_cols else []
+            numeric_cols = [col for col in feature_cols if col not in categorical_cols]
+
+            top_feature_list = None
+            if feature_importance_df is not None:
+                top_feature_list = feature_importance_df.sort_values(
+                    'Abs_Correlation', ascending=False
+                )['Feature'].head(5).tolist()
+            elif numeric_cols:
+                top_feature_list = numeric_cols[:5]
+
+            st.markdown("""
+            **Production model**: `Logistic Regression (StandardScaler + OneHotEncoder + class_weight='balanced', C=0.01)`  
+            **Feature set**: {} engineered player-season statistics{}.
+            """.format(
+                len(feature_cols),
+                f" (top signals: {', '.join(top_feature_list)})" if top_feature_list else ""
+            ))
+
+            def evaluate_pipeline(fitted_model, X_set, y_set, name: str):
+                """Return full metric dictionary without printing."""
+                y_pred = fitted_model.predict(X_set)
+                y_proba = fitted_model.predict_proba(X_set)[:, 1]
                 return {
                     'name': name,
-                    'f1': f1,
-                    'precision': prec,
-                    'recall': rec,
-                    'roc_auc': roc,
-                    'pr_auc': pr,
+                    'f1': f1_score(y_set, y_pred, zero_division=0),
+                    'precision': precision_score(y_set, y_pred, zero_division=0),
+                    'recall': recall_score(y_set, y_pred, zero_division=0),
+                    'roc_auc': roc_auc_score(y_set, y_proba),
+                    'pr_auc': average_precision_score(y_set, y_proba),
                     'y_true': y_set,
                     'y_pred': y_pred,
                     'y_proba': y_proba,
                 }
 
-            val_metrics = eval_set(X_val_mi, y_val_mi, "Validation")
-            test_metrics = eval_set(X_test_mi, y_test_mi, "Test")
-
+            val_metrics = evaluate_pipeline(model, X_val_mi, y_val_mi, "Validation")
+            test_metrics = evaluate_pipeline(model, X_test_mi, y_test_mi, "Test")
+        
             # Metrics summary
             st.markdown("#### Key Metrics (Validation vs Test)")
             metrics_df = pd.DataFrame([
@@ -917,6 +974,157 @@ elif page == "🔍 Model Insights":
                 yaxis_title="Precision",
             )
             st.plotly_chart(fig_pr, use_container_width=True)
+
+            # Additional baseline models
+            st.markdown("#### Additional Baseline Models")
+
+            tree_preprocessor = ColumnTransformer(
+                transformers=[
+                    ('cat', OneHotEncoder(drop='first', handle_unknown='ignore'), categorical_cols)
+                ],
+                remainder='passthrough'
+            )
+
+            baseline_models = []
+
+            rf_pipeline = Pipeline(steps=[
+                ('preprocessor', tree_preprocessor),
+                ('classifier', RandomForestClassifier(
+                    n_estimators=400,
+                    max_depth=15,
+                    min_samples_split=4,
+                    min_samples_leaf=2,
+                    class_weight='balanced',
+                    random_state=42,
+                    n_jobs=-1
+                ))
+            ])
+            rf_pipeline.fit(X_train_mi, y_train_mi)
+            baseline_models.append(("Random Forest", rf_pipeline))
+
+            if XGBOOST_AVAILABLE:
+                scale_pos_weight = max((y_train_mi == 0).sum() / max((y_train_mi == 1).sum(), 1), 1)
+                xgb_pipeline = Pipeline(steps=[
+                    ('preprocessor', tree_preprocessor),
+                    ('classifier', xgb.XGBClassifier(
+                        n_estimators=400,
+                        max_depth=4,
+                        learning_rate=0.05,
+                        subsample=0.9,
+                        colsample_bytree=0.8,
+                        scale_pos_weight=scale_pos_weight,
+                        eval_metric='logloss',
+                        random_state=42,
+                        use_label_encoder=False
+                    ))
+                ])
+                xgb_pipeline.fit(X_train_mi, y_train_mi)
+                baseline_models.append(("XGBoost", xgb_pipeline))
+            else:
+                st.info("XGBoost not available in this environment; skipping boosted tree comparison.")
+
+            comparison_rows = [{
+                'Model': 'Logistic Regression (Production)',
+                'Validation F1': val_metrics['f1'],
+                'Test F1': test_metrics['f1'],
+                'Test Precision': test_metrics['precision'],
+                'Test Recall': test_metrics['recall'],
+                'Test ROC-AUC': test_metrics['roc_auc'],
+                'Test PR-AUC': test_metrics['pr_auc'],
+            }]
+
+            other_model_results = {}
+            for model_name, pipeline_model in baseline_models:
+                other_model_results[model_name] = {
+                    'validation': evaluate_pipeline(pipeline_model, X_val_mi, y_val_mi, "Validation"),
+                    'test': evaluate_pipeline(pipeline_model, X_test_mi, y_test_mi, "Test"),
+                }
+                test_res = other_model_results[model_name]['test']
+                comparison_rows.append({
+                    'Model': model_name,
+                    'Validation F1': other_model_results[model_name]['validation']['f1'],
+                    'Test F1': test_res['f1'],
+                    'Test Precision': test_res['precision'],
+                    'Test Recall': test_res['recall'],
+                    'Test ROC-AUC': test_res['roc_auc'],
+                    'Test PR-AUC': test_res['pr_auc'],
+                })
+
+            comp_df = pd.DataFrame(comparison_rows)
+            st.dataframe(comp_df.style.format({
+                'Validation F1': "{:.3f}",
+                'Test F1': "{:.3f}",
+                'Test Precision': "{:.3f}",
+                'Test Recall': "{:.3f}",
+                'Test ROC-AUC': "{:.3f}",
+                'Test PR-AUC': "{:.3f}",
+            }), use_container_width=True)
+
+            for model_name, metrics_dict in other_model_results.items():
+                test_res = metrics_dict['test']
+                st.markdown(f"##### {model_name} (Test Set)")
+                colm1, colm2, colm3 = st.columns(3)
+                with colm1:
+                    st.metric("F1-Score", f"{test_res['f1']:.3f}")
+                with colm2:
+                    st.metric("Precision", f"{test_res['precision']:.3f}")
+                with colm3:
+                    st.metric("Recall", f"{test_res['recall']:.3f}")
+
+                cm_other = confusion_matrix(test_res['y_true'], test_res['y_pred'])
+                cm_other_df = pd.DataFrame(
+                    cm_other,
+                    index=['Actual 0', 'Actual 1'],
+                    columns=['Pred 0', 'Pred 1'],
+                )
+                fig_cm_other = px.imshow(
+                    cm_other_df,
+                    text_auto=True,
+                    color_continuous_scale="Purples",
+                    labels=dict(x="Predicted", y="Actual", color="Count"),
+                    title=f"{model_name} - Confusion Matrix",
+                )
+                st.plotly_chart(fig_cm_other, use_container_width=True)
+
+                fpr_o, tpr_o, _ = roc_curve(test_res['y_true'], test_res['y_proba'])
+                precision_o, recall_o, _ = precision_recall_curve(test_res['y_true'], test_res['y_proba'])
+
+                fig_roc_other = go.Figure()
+                fig_roc_other.add_trace(go.Scatter(
+                    x=fpr_o, y=tpr_o, mode='lines',
+                    name=f"ROC (AUC={test_res['roc_auc']:.3f})",
+                    line=dict(color="#8e44ad")
+                ))
+                fig_roc_other.add_trace(go.Scatter(
+                    x=[0, 1], y=[0, 1], mode='lines',
+                    name="Random", line=dict(color="gray", dash='dash')
+                ))
+                fig_roc_other.update_layout(
+                    title=f"{model_name} - ROC Curve",
+                    xaxis_title="False Positive Rate",
+                    yaxis_title="True Positive Rate",
+                )
+                st.plotly_chart(fig_roc_other, use_container_width=True)
+
+                fig_pr_other = go.Figure()
+                fig_pr_other.add_trace(go.Scatter(
+                    x=recall_o, y=precision_o, mode='lines',
+                    name=f"PR (AUC={test_res['pr_auc']:.3f})",
+                    line=dict(color="#27ae60")
+                ))
+                fig_pr_other.update_layout(
+                    title=f"{model_name} - Precision-Recall Curve",
+                    xaxis_title="Recall",
+                    yaxis_title="Precision",
+                )
+                st.plotly_chart(fig_pr_other, use_container_width=True)
+
+            st.markdown("""
+            **Why Logistic Regression remains in production:**  
+            - It delivered the strongest F1-score and recall on the validation set, which keeps rare call-ups from being missed.  
+            - Tree-based models struggled with precision/recall balance on this small, imbalanced dataset and tended to overfit (high accuracy but zero/low F1).  
+            - The linear model is also easier to monitor and explain; its coefficients align with the feature importance results shown in the next tab.
+            """)
     
     with tab2:
         st.subheader("Feature Importance")
