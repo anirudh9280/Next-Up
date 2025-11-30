@@ -133,7 +133,7 @@ def load_data():
 
 
 @st.cache_data
-def load_prediction_data():
+def load_prediction_data(pred_version: float = None, feat_version: float = None):
     """Load cleaned prediction dataset and feature importance (for modeling)."""
     base_path = Path(__file__).parent
     pred_path = base_path / 'data' / 'prediction_dataset_callups_nba_cleaned.csv'
@@ -156,10 +156,11 @@ def load_prediction_data():
 
 
 @st.cache_resource
-def load_model():
+def load_model(pred_version: float = None):
     """Load the pre-trained Logistic Regression pipeline (or train/save a fallback)."""
     base_path = Path(__file__).parent
-    model_path = base_path / 'models' / 'log_reg_callup_pipeline.joblib'
+    version_suffix = f"_{int(pred_version)}" if pred_version else ""
+    model_path = base_path / 'models' / f'log_reg_callup_pipeline{version_suffix}.joblib'
 
     if model_path.exists():
         try:
@@ -173,7 +174,7 @@ def load_model():
             except Exception:
                 pass
 
-    pred_df, _ = load_prediction_data()
+    pred_df, _ = load_prediction_data(pred_version=pred_version)
     if pred_df is None:
         st.error("Prediction dataset not available; cannot initialize model.")
         return None
@@ -239,8 +240,13 @@ st.sidebar.info(
 
 # Load data
 players_df, rosters_df, teams_df, callups_df = load_data()
-prediction_df, feature_importance_df = load_prediction_data()
-model = load_model()
+
+pred_path = Path(__file__).parent / 'data' / 'prediction_dataset_callups_nba_cleaned.csv'
+feat_path = Path(__file__).parent / 'data' / 'feature_importance_callups_nba.csv'
+pred_version = pred_path.stat().st_mtime if pred_path.exists() else None
+feat_version = feat_path.stat().st_mtime if feat_path.exists() else None
+prediction_df, feature_importance_df = load_prediction_data(pred_version=pred_version, feat_version=feat_version)
+model = load_model(pred_version=pred_version)
 
 
 def get_latest_player_predictions():
