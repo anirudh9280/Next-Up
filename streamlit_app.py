@@ -677,7 +677,7 @@ elif page == "📊 Data Explorer":
     st.write("Explore the G-League dataset")
     
     # Dataset selector
-    dataset_options = ["Players", "Rosters", "Teams", "Call-Ups (if available)"]
+    dataset_options = ["Players", "Rosters", "Teams", "Call-Ups"]
     if prediction_df is not None:
         dataset_options.append("Prediction Dataset (Cleaned)")
 
@@ -716,7 +716,7 @@ elif page == "📊 Data Explorer":
         st.write(f"Total teams: {len(teams_df)}")
         st.dataframe(teams_df, use_container_width=True)
     
-    elif dataset == "Call-Ups (if available)":
+    elif dataset == "Call-Ups":
         if callups_df is not None:
             st.subheader("🎯 NBA.com Call-Ups (2019-2025 Aggregated)")
             st.write(
@@ -728,20 +728,47 @@ elif page == "📊 Data Explorer":
             st.markdown("---")
             st.subheader("📊 Season & Contract Trends")
 
-            if 'season_year' in callups_df.columns:
+            season_cols = {'season_year', 'season_label', 'times_called_up'}
+            if season_cols.issubset(callups_df.columns):
                 season_counts = (
+                    callups_df
+                    .groupby(['season_label', 'season_year'], as_index=False)['times_called_up']
+                    .sum()
+                    .rename(columns={'times_called_up': 'callups'})
+                    .sort_values('season_year')
+                )
+                fig_season = px.bar(
+                    season_counts,
+                    x='season_label',
+                    y='callups',
+                    labels={'season_label': 'Season', 'callups': 'Number of Call-Ups'},
+                    title='Call-Ups by Season',
+                    category_orders={'season_label': season_counts['season_label'].tolist()},
+                )
+                fig_season.update_layout(xaxis_tickangle=-25)
+                st.plotly_chart(fig_season, use_container_width=True)
+                st.caption(
+                    "Note: Certain pandemic-shortened seasons (e.g., 2020-21 bubble) are omitted "
+                    "from NBA.com call-up logs, so gaps around 2020 reflect missing league play rather than zero activity."
+                )
+            elif 'season_year' in callups_df.columns:
+                legacy_counts = (
                     callups_df.groupby('season_year')['times_called_up']
                     .sum()
                     .reset_index(name='callups')
                 )
                 fig_season = px.bar(
-                    season_counts,
+                    legacy_counts,
                     x='season_year',
                     y='callups',
                     labels={'season_year': 'Season', 'callups': 'Number of Call-Ups'},
                     title='Call-Ups by Season',
-                                )
+                )
                 st.plotly_chart(fig_season, use_container_width=True)
+                st.caption(
+                    "Note: Certain pandemic-shortened seasons (e.g., 2020-21 bubble) are omitted "
+                    "from NBA.com call-up logs, so gaps around 2020 reflect missing league play rather than zero activity."
+                )
 
             if 'contract_type' in callups_df.columns:
                 contract_counts = (
