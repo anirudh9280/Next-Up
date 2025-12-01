@@ -29,13 +29,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-
-try:
-    import xgboost as xgb  # type: ignore
-    XGBOOST_AVAILABLE = True
-except Exception:
-    XGBOOST_AVAILABLE = False
 
 try:
     import shap  # type: ignore
@@ -863,7 +856,7 @@ elif page == "📊 Data Explorer":
 elif page == "🔍 Model Insights":
     st.header("🔍 Model Insights & Performance")
     
-    tab1, tab2, tab3 = st.tabs(["📊 Performance Metrics", "🎯 Feature Importance", "📈 Model Validation"])
+    tab1, tab2 = st.tabs(["📊 Performance Metrics", "🎯 Feature Importance"])
     
     with tab1:
         st.subheader("Model Performance Metrics")
@@ -871,7 +864,17 @@ elif page == "🔍 Model Insights":
         if prediction_df is None or model is None:
             st.warning("Prediction dataset or trained model not available.")
         else:
-            # Recreate stratified splits (same strategy as in analysis.ipynb)
+            # Tuned Logistic Regression metrics captured from analysis.ipynb (5-fold CV)
+            LOGREG_TUNED_DISPLAY = {
+                'label': "5-fold CV (tuned)",
+                'f1': 0.280702,
+                'precision': 0.173913,
+                'recall': 0.727273,
+                'roc_auc': 0.846591,
+                'pr_auc': 0.338023,
+            }
+
+            # Recreate stratified splits (same strategy as in analysis.ipynb) for diagnostic plots
             from sklearn.model_selection import train_test_split
 
             exclude_cols = ['player_name', 'season_year', 'called_up']
@@ -906,10 +909,29 @@ elif page == "🔍 Model Insights":
                 f" (top signals: {', '.join(top_feature_list)})" if top_feature_list else ""
             ))
 
-            def evaluate_pipeline(fitted_model, X_set, y_set, name: str):
-                """Return full metric dictionary without printing."""
-                y_pred = fitted_model.predict(X_set)
+            def evaluate_pipeline(
+                fitted_model,
+                X_set,
+                y_set,
+                name: str,
+                threshold: float | None = None,
+                optimize_threshold: bool = False,
+            ):
+                """Return full metric dictionary with optional threshold tuning."""
                 y_proba = fitted_model.predict_proba(X_set)[:, 1]
+
+                best_threshold = 0.5 if threshold is None else threshold
+                if optimize_threshold:
+                    candidate_thresholds = np.linspace(0.05, 0.95, 19)
+                    best_f1 = -1.0
+                    for thr in candidate_thresholds:
+                        trial_pred = (y_proba >= thr).astype(int)
+                        trial_f1 = f1_score(y_set, trial_pred, zero_division=0)
+                        if trial_f1 > best_f1:
+                            best_f1 = trial_f1
+                            best_threshold = thr
+
+                y_pred = (y_proba >= best_threshold).astype(int)
                 return {
                     'name': name,
                     'f1': f1_score(y_set, y_pred, zero_division=0),
@@ -920,24 +942,28 @@ elif page == "🔍 Model Insights":
                     'y_true': y_set,
                     'y_pred': y_pred,
                     'y_proba': y_proba,
+                    'threshold': best_threshold,
                 }
 
-            val_metrics = evaluate_pipeline(model, X_val_mi, y_val_mi, "Validation")
-            test_metrics = evaluate_pipeline(model, X_test_mi, y_test_mi, "Test")
-        
-            # Metrics summary
-            st.markdown("#### Key Metrics (Validation vs Test)")
-            metrics_df = pd.DataFrame([
-                {
-                    'Set': m['name'],
-                    'F1-Score': m['f1'],
-                    'Precision': m['precision'],
-                    'Recall': m['recall'],
-                    'ROC-AUC': m['roc_auc'],
-                    'PR-AUC': m['pr_auc'],
-                }
-                for m in [val_metrics, test_metrics]
-            ])
+            # Fit for diagnostics (confusion matrix, ROC, etc.)
+            live_val_metrics = evaluate_pipeline(
+                model, X_val_mi, y_val_mi, "Validation", optimize_threshold=True
+            )
+            best_threshold = live_val_metrics['threshold']
+            test_metrics = evaluate_pipeline(
+                model, X_test_mi, y_test_mi, "Test", threshold=best_threshold
+            )
+
+            # Metrics summary (display tuned hyperparameter results)
+            st.markdown("#### Tuned Logistic Regression (5-fold Cross-Validation)")
+            metrics_df = pd.DataFrame([{
+                'Benchmark': LOGREG_TUNED_DISPLAY['label'],
+                'F1-Score': LOGREG_TUNED_DISPLAY['f1'],
+                'Precision': LOGREG_TUNED_DISPLAY['precision'],
+                'Recall': LOGREG_TUNED_DISPLAY['recall'],
+                'ROC-AUC': LOGREG_TUNED_DISPLAY['roc_auc'],
+                'PR-AUC': LOGREG_TUNED_DISPLAY['pr_auc'],
+            }])
             st.dataframe(metrics_df.style.format({
                 'F1-Score': "{:.3f}",
                 'Precision': "{:.3f}",
@@ -948,13 +974,13 @@ elif page == "🔍 Model Insights":
 
             col1m, col2m, col3m, col4m = st.columns(4)
             with col1m:
-                st.metric("Test F1-Score", f"{test_metrics['f1']:.3f}")
+                st.metric("Tuned F1-Score", f"{LOGREG_TUNED_DISPLAY['f1']:.3f}")
             with col2m:
-                st.metric("Test Precision", f"{test_metrics['precision']:.3f}")
+                st.metric("Tuned Precision", f"{LOGREG_TUNED_DISPLAY['precision']:.3f}")
             with col3m:
-                st.metric("Test Recall", f"{test_metrics['recall']:.3f}")
+                st.metric("Tuned Recall", f"{LOGREG_TUNED_DISPLAY['recall']:.3f}")
             with col4m:
-                st.metric("Test ROC-AUC", f"{test_metrics['roc_auc']:.3f}")
+                st.metric("Tuned ROC-AUC", f"{LOGREG_TUNED_DISPLAY['roc_auc']:.3f}")
 
             # Confusion matrix (test set)
             st.markdown("#### Confusion Matrix (Test Set)")
@@ -1008,155 +1034,50 @@ elif page == "🔍 Model Insights":
             )
             st.plotly_chart(fig_pr, use_container_width=True)
 
-            # Additional baseline models
-            st.markdown("#### Additional Baseline Models")
+            # Additional baseline models (pre-computed validation benchmarks)
+            st.markdown("#### Baseline Model Benchmarks (Validation Set)")
 
-            tree_preprocessor = ColumnTransformer(
-                transformers=[
-                    ('cat', OneHotEncoder(drop='first', handle_unknown='ignore'), categorical_cols)
-                ],
-                remainder='passthrough'
+            baseline_benchmarks = pd.DataFrame([
+                {
+                    'Model': 'XGBoost',
+                    'F1-Score': 0.300000,
+                    'Precision': 0.333333,
+                    'Recall': 0.272727,
+                    'ROC-AUC': 0.830966,
+                    'PR-AUC': 0.230214,
+                },
+                {
+                    'Model': 'Random Forest',
+                    'F1-Score': 0.166667,
+                    'Precision': 1.000000,
+                    'Recall': 0.090909,
+                    'ROC-AUC': 0.892756,
+                    'PR-AUC': 0.272643,
+                },
+            ])
+
+            st.info(
+                "These baseline values are pulled directly from the validation comparison in "
+                "`analysis.ipynb`. They give you a quick reference for how the tree-based models "
+                "performed without forcing the Streamlit app to retrain heavy estimators."
             )
 
-            baseline_models = []
-
-            rf_pipeline = Pipeline(steps=[
-                ('preprocessor', tree_preprocessor),
-                ('classifier', RandomForestClassifier(
-                    n_estimators=400,
-                    max_depth=15,
-                    min_samples_split=4,
-                    min_samples_leaf=2,
-                    class_weight='balanced',
-                    random_state=42,
-                    n_jobs=-1
-                ))
-            ])
-            rf_pipeline.fit(X_train_mi, y_train_mi)
-            baseline_models.append(("Random Forest", rf_pipeline))
-
-            if XGBOOST_AVAILABLE:
-                scale_pos_weight = max((y_train_mi == 0).sum() / max((y_train_mi == 1).sum(), 1), 1)
-                xgb_pipeline = Pipeline(steps=[
-                    ('preprocessor', tree_preprocessor),
-                    ('classifier', xgb.XGBClassifier(
-                        n_estimators=400,
-                        max_depth=4,
-                        learning_rate=0.05,
-                        subsample=0.9,
-                        colsample_bytree=0.8,
-                        scale_pos_weight=scale_pos_weight,
-                        eval_metric='logloss',
-                        random_state=42,
-                        use_label_encoder=False
-                    ))
-                ])
-                xgb_pipeline.fit(X_train_mi, y_train_mi)
-                baseline_models.append(("XGBoost", xgb_pipeline))
-            else:
-                st.info("XGBoost not available in this environment; skipping boosted tree comparison.")
-
-            comparison_rows = [{
-                'Model': 'Logistic Regression (Production)',
-                'Validation F1': val_metrics['f1'],
-                'Test F1': test_metrics['f1'],
-                'Test Precision': test_metrics['precision'],
-                'Test Recall': test_metrics['recall'],
-                'Test ROC-AUC': test_metrics['roc_auc'],
-                'Test PR-AUC': test_metrics['pr_auc'],
-            }]
-
-            other_model_results = {}
-            for model_name, pipeline_model in baseline_models:
-                other_model_results[model_name] = {
-                    'validation': evaluate_pipeline(pipeline_model, X_val_mi, y_val_mi, "Validation"),
-                    'test': evaluate_pipeline(pipeline_model, X_test_mi, y_test_mi, "Test"),
-                }
-                test_res = other_model_results[model_name]['test']
-                comparison_rows.append({
-                    'Model': model_name,
-                    'Validation F1': other_model_results[model_name]['validation']['f1'],
-                    'Test F1': test_res['f1'],
-                    'Test Precision': test_res['precision'],
-                    'Test Recall': test_res['recall'],
-                    'Test ROC-AUC': test_res['roc_auc'],
-                    'Test PR-AUC': test_res['pr_auc'],
-                })
-
-            comp_df = pd.DataFrame(comparison_rows)
-            st.dataframe(comp_df.style.format({
-                'Validation F1': "{:.3f}",
-                'Test F1': "{:.3f}",
-                'Test Precision': "{:.3f}",
-                'Test Recall': "{:.3f}",
-                'Test ROC-AUC': "{:.3f}",
-                'Test PR-AUC': "{:.3f}",
-            }), use_container_width=True)
-
-            for model_name, metrics_dict in other_model_results.items():
-                test_res = metrics_dict['test']
-                st.markdown(f"##### {model_name} (Test Set)")
-                colm1, colm2, colm3 = st.columns(3)
-                with colm1:
-                    st.metric("F1-Score", f"{test_res['f1']:.3f}")
-                with colm2:
-                    st.metric("Precision", f"{test_res['precision']:.3f}")
-                with colm3:
-                    st.metric("Recall", f"{test_res['recall']:.3f}")
-
-                cm_other = confusion_matrix(test_res['y_true'], test_res['y_pred'])
-                cm_other_df = pd.DataFrame(
-                    cm_other,
-                    index=['Actual 0', 'Actual 1'],
-                    columns=['Pred 0', 'Pred 1'],
-                )
-                fig_cm_other = px.imshow(
-                    cm_other_df,
-                    text_auto=True,
-                    color_continuous_scale="Purples",
-                    labels=dict(x="Predicted", y="Actual", color="Count"),
-                    title=f"{model_name} - Confusion Matrix",
-                )
-                st.plotly_chart(fig_cm_other, use_container_width=True)
-
-                fpr_o, tpr_o, _ = roc_curve(test_res['y_true'], test_res['y_proba'])
-                precision_o, recall_o, _ = precision_recall_curve(test_res['y_true'], test_res['y_proba'])
-
-                fig_roc_other = go.Figure()
-                fig_roc_other.add_trace(go.Scatter(
-                    x=fpr_o, y=tpr_o, mode='lines',
-                    name=f"ROC (AUC={test_res['roc_auc']:.3f})",
-                    line=dict(color="#8e44ad")
-                ))
-                fig_roc_other.add_trace(go.Scatter(
-                    x=[0, 1], y=[0, 1], mode='lines',
-                    name="Random", line=dict(color="gray", dash='dash')
-                ))
-                fig_roc_other.update_layout(
-                    title=f"{model_name} - ROC Curve",
-                    xaxis_title="False Positive Rate",
-                    yaxis_title="True Positive Rate",
-                )
-                st.plotly_chart(fig_roc_other, use_container_width=True)
-
-                fig_pr_other = go.Figure()
-                fig_pr_other.add_trace(go.Scatter(
-                    x=recall_o, y=precision_o, mode='lines',
-                    name=f"PR (AUC={test_res['pr_auc']:.3f})",
-                    line=dict(color="#27ae60")
-                ))
-                fig_pr_other.update_layout(
-                    title=f"{model_name} - Precision-Recall Curve",
-                    xaxis_title="Recall",
-                    yaxis_title="Precision",
-                )
-                st.plotly_chart(fig_pr_other, use_container_width=True)
+            st.dataframe(
+                baseline_benchmarks.style.format({
+                    'F1-Score': "{:.3f}",
+                    'Precision': "{:.3f}",
+                    'Recall': "{:.3f}",
+                    'ROC-AUC': "{:.3f}",
+                    'PR-AUC': "{:.3f}",
+                }),
+                use_container_width=True,
+            )
 
             st.markdown("""
             **Why Logistic Regression remains in production:**  
-            - It delivered the strongest F1-score and recall on the validation set, which keeps rare call-ups from being missed.  
-            - Tree-based models struggled with precision/recall balance on this small, imbalanced dataset and tended to overfit (high accuracy but zero/low F1).  
-            - The linear model is also easier to monitor and explain; its coefficients align with the feature importance results shown in the next tab.
+            - Tuned Logistic Regression still reaches an F1-score of **0.28** with strong recall (0.73), providing dependable detection of rare call-ups.  
+            - XGBoost did edge it out slightly on F1 (0.30) but produced less interpretable decision boundaries, making it harder to explain to coaches and front-office staff.  
+            - The linear model’s coefficients map directly to the feature importance analysis below, so we can clearly justify every recommendation while keeping maintenance simple.
             """)
     
     with tab2:
@@ -1164,6 +1085,7 @@ elif page == "🔍 Model Insights":
         if feature_importance_df is not None:
             top_n = st.slider("Number of top features to display:", 5, 30, 20)
             fi = feature_importance_df.copy()
+            fi = fi[~fi['Feature'].isin(['times_called_up', 'times_called_up_sqrt'])]
             fi = fi.sort_values('Abs_Correlation', ascending=False).head(top_n)
 
             fig_fi = px.bar(
@@ -1185,57 +1107,6 @@ elif page == "🔍 Model Insights":
             """)
         else:
             st.info("Feature importance file not found. Please generate it from EDA.")
-    
-    with tab3:
-        st.subheader("Historical Validation")
-        if prediction_df is None or model is None:
-            st.warning("Prediction dataset or trained model not available.")
-        else:
-            # Reuse metrics computed in tab1
-            st.markdown("""
-            This section summarizes how well the model performed on the held-out **test set**.
-            The test set simulates future seasons the model has never seen before.
-            """)
-
-            # Recompute splits and metrics quickly (same as in tab1)
-            from sklearn.model_selection import train_test_split
-            exclude_cols = ['player_name', 'season_year', 'called_up']
-            feature_cols = [c for c in prediction_df.columns if c not in exclude_cols]
-            X = prediction_df[feature_cols].copy()
-            y = prediction_df['called_up'].copy()
-            X_temp, X_test_h, y_temp, y_test_h = train_test_split(
-                X, y, test_size=0.2, stratify=y, random_state=42
-            )
-            # Use entire X_test_h / y_test_h
-            y_pred_h = model.predict(X_test_h)
-            y_proba_h = model.predict_proba(X_test_h)[:, 1]
-
-            f1_h = f1_score(y_test_h, y_pred_h)
-            prec_h = precision_score(y_test_h, y_pred_h)
-            rec_h = recall_score(y_test_h, y_pred_h)
-            roc_h = roc_auc_score(y_test_h, y_proba_h)
-            pr_h = average_precision_score(y_test_h, y_proba_h)
-
-            st.markdown("#### Test Set Metrics")
-            col_a, col_b, col_c, col_d, col_e = st.columns(5)
-            with col_a:
-                st.metric("F1-Score", f"{f1_h:.3f}")
-            with col_b:
-                st.metric("Precision", f"{prec_h:.3f}")
-            with col_c:
-                st.metric("Recall", f"{rec_h:.3f}")
-            with col_d:
-                st.metric("ROC-AUC", f"{roc_h:.3f}")
-            with col_e:
-                st.metric("PR-AUC", f"{pr_h:.3f}")
-
-            st.markdown("""
-            - **F1-Score** balances the trade-off between precision and recall on rare call-ups.  
-            - **Precision** tells us what fraction of predicted call-ups actually got called up.  
-            - **Recall** measures how many of the true call-ups we successfully identified.  
-            - **ROC-AUC / PR-AUC** summarize overall ranking quality and performance on the imbalanced dataset.
-            """)
-
 # Footer
 st.markdown("---")
 st.markdown("""
