@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 from pathlib import Path
 import os
 import joblib
+import xgboost as xgb
 from sklearn.metrics import (
     confusion_matrix,
     roc_auc_score,
@@ -149,7 +150,7 @@ def load_prediction_data(pred_version: float = None, feat_version: float = None)
 
 
 @st.cache_resource
-def load_model(pred_version: float = None):
+def load_log_reg_model(pred_version: float = None):
     """Load the pre-trained Logistic Regression pipeline (or train/save a fallback)."""
     base_path = Path(__file__).parent
     version_suffix = f"_{int(pred_version)}" if pred_version else ""
@@ -217,6 +218,86 @@ def load_model(pred_version: float = None):
     st.success("✅ Trained and cached Logistic Regression model from the cleaned dataset.")
     return pipeline
 
+
+@st.cache_resource
+def load_xgb_model(pred_version: float = None):
+    """Load the pre-trained XGBoost pipeline (or train/save a fallback)."""
+    base_path = Path(__file__).parent
+    version_suffix = f"_{int(pred_version)}" if pred_version else ""
+    model_path = base_path / 'models' / f'xgb_callup_pipeline{version_suffix}.joblib'
+
+    if model_path.exists():
+        try:
+            model = joblib.load(model_path)
+            st.success("✅ Loaded XGBoost pipeline from saved artifact.")
+            return model
+        except Exception:
+            try:
+                model_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+
+    pred_df, _ = load_prediction_data(pred_version=pred_version)
+    if pred_df is None:
+        st.error("Prediction dataset not available; cannot initialize XGBoost model.")
+        return None
+
+    exclude_cols = ['player_name', 'season_year', 'called_up']
+    feature_cols = [c for c in pred_df.columns if c not in exclude_cols]
+    categorical_cols = ['position'] if 'position' in feature_cols else []
+    numeric_cols = [c for c in feature_cols if c not in categorical_cols]
+
+    categorical_transformer = OneHotEncoder(drop='first', handle_unknown='ignore')
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', 'passthrough', numeric_cols),
+            ('cat', categorical_transformer, categorical_cols),
+        ]
+    )
+
+    scale_pos_weight = (pred_df['called_up'] == 0).sum() / (pred_df['called_up'] == 1).sum()
+
+    xgb_clf = xgb.XGBClassifier(
+        objective='binary:logistic',
+        eval_metric='logloss',
+        use_label_encoder=False,
+        n_estimators=400,
+        max_depth=5,
+        learning_rate=0.05,
+        subsample=0.9,
+        colsample_bytree=0.75,
+        min_child_weight=2,
+        gamma=0.1,
+        reg_lambda=1.5,
+        reg_alpha=0.25,
+        scale_pos_weight=scale_pos_weight,
+        random_state=42,
+        tree_method='hist'
+    )
+
+    pipeline = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('classifier', xgb_clf),
+    ])
+
+    X = pred_df[feature_cols].copy()
+    y = pred_df['called_up'].copy()
+
+    try:
+        pipeline.fit(X, y)
+    except Exception as exc:
+        st.error(f"Failed to train fallback XGBoost model: {exc}")
+        return None
+
+    try:
+        os.makedirs(model_path.parent, exist_ok=True)
+        joblib.dump(pipeline, model_path)
+    except Exception as exc:
+        st.warning(f"Trained XGBoost model but could not save artifact ({exc}).")
+
+    st.success("✅ Trained and cached XGBoost model from the cleaned dataset.")
+    return pipeline
+
 # Sidebar navigation
 st.sidebar.title("🏀 Navigation")
 page = st.sidebar.radio(
@@ -239,12 +320,13 @@ feat_path = Path(__file__).parent / 'data' / 'feature_importance_callups_nba.csv
 pred_version = pred_path.stat().st_mtime if pred_path.exists() else None
 feat_version = feat_path.stat().st_mtime if feat_path.exists() else None
 prediction_df, feature_importance_df = load_prediction_data(pred_version=pred_version, feat_version=feat_version)
-model = load_model(pred_version=pred_version)
+log_reg_model = load_log_reg_model(pred_version=pred_version)
+xgb_model = load_xgb_model(pred_version=pred_version)
 
 
-def get_latest_player_predictions():
-    """Return latest season row per player with model-predicted probability."""
-    if prediction_df is None or model is None:
+def get_latest_player_predictions(log_model=None, xgb_pipeline=None):
+    """Return latest season row per player with cached model predictions."""
+    if prediction_df is None or (log_model is None and xgb_pipeline is None):
         return None
 
     exclude_cols = ['player_name', 'season_year', 'called_up']
@@ -258,17 +340,31 @@ def get_latest_player_predictions():
         .reset_index(drop=True)
     )
 
-    try:
-        probs = model.predict_proba(latest[feature_cols])[:, 1]
-    except Exception:
+    latest = latest.copy()
+
+    if log_model is not None:
+        try:
+            probs_lr = log_model.predict_proba(latest[feature_cols])[:, 1]
+            latest['pred_prob_lr'] = probs_lr
+            latest['pred_prob'] = probs_lr  # backward compatibility
+        except Exception:
+            st.warning("Unable to compute Logistic Regression probabilities for leaderboard view.")
+
+    if xgb_pipeline is not None:
+        try:
+            probs_xgb = xgb_pipeline.predict_proba(latest[feature_cols])[:, 1]
+            latest['pred_prob_xgb'] = probs_xgb
+            latest['pred_callup_xgb'] = xgb_pipeline.predict(latest[feature_cols])
+        except Exception:
+            st.warning("Unable to compute XGBoost predictions for leaderboard view.")
+
+    if 'pred_prob_lr' not in latest.columns and 'pred_callup_xgb' not in latest.columns:
         return None
 
-    latest = latest.copy()
-    latest['pred_prob'] = probs
     return latest
 
 
-latest_predictions_df = get_latest_player_predictions()
+latest_predictions_df = get_latest_player_predictions(log_reg_model, xgb_model)
 
 # ==================== HOME PAGE ====================
 if page == "🏠 Home":
@@ -348,28 +444,20 @@ elif page == "👤 Player Prediction":
     if prediction_df is None:
         st.error("Prediction dataset not available. Please generate it via analysis/EDA.")
     else:
-        # Player selection
-        col1, col2 = st.columns([2, 1])
-        
-        with col1:
-            if latest_predictions_df is not None:
-                player_options = sorted(latest_predictions_df['player_name'].dropna().unique())
-            elif players_df is not None:
-                player_options = sorted(players_df['full_name'].dropna().unique())
-            else:
-                player_options = []
+        # Player selection (auto-updates when the user changes the dropdown)
+        if latest_predictions_df is not None:
+            player_options = sorted(latest_predictions_df['player_name'].dropna().unique())
+        elif players_df is not None:
+            player_options = sorted(players_df['full_name'].dropna().unique())
+        else:
+            player_options = []
 
-            player_name = st.selectbox(
-                "Select a player:",
-                options=player_options
-            )
+        player_name = st.selectbox(
+            "Select a player:",
+            options=player_options
+        )
         
-        with col2:
-            st.write("")
-            st.write("")
-            predict_button = st.button("🔮 Predict Call-Up Probability", type="primary")
-        
-        if predict_button or player_name:
+        if player_name:
             st.markdown("---")
 
             # Get latest prediction row for this player (from prediction dataset)
@@ -399,53 +487,70 @@ elif page == "👤 Player Prediction":
             st.markdown("---")
             
             # Model prediction + actual outcome
-            if model is None or latest_predictions_df is None or pred_row is None:
-                st.warning("⚠️ Trained model or prediction data not available.")
+            if latest_predictions_df is None or pred_row is None:
+                st.warning("⚠️ Prediction data not available for this player.")
             else:
-                prob = float(pred_row['pred_prob'])
-                season = int(pred_row['season_year'])
+                season_display = pred_row.get('season_year', 'N/A')
                 actual_called_up = int(pred_row.get('called_up', 0))
 
-                st.subheader("📊 Predicted Call-Up Probability")
-                st.write(f"Using data from season **{season}**.")
+                st.subheader("🤖 Model Predictions")
+                lr_tab, xgb_tab = st.tabs(["Logistic Regression", "XGBoost"])
 
-                fig = go.Figure(go.Indicator(
-                    mode="gauge+number",
-                    value=prob * 100,
-                    title={'text': "Call-Up Probability"},
-                    gauge={
-                        'axis': {'range': [None, 100]},
-                        'bar': {'color': "darkblue"},
-                        'steps': [
-                            {'range': [0, 25], 'color': "lightgray"},
-                            {'range': [25, 50], 'color': "lightyellow"},
-                            {'range': [50, 75], 'color': "lightgreen"},
-                            {'range': [75, 100], 'color': "green"}
-                        ]
-                    }
-                ))
-                st.plotly_chart(fig, use_container_width=True)
-                
-                label = (
-                    "**HIGH**" if prob > 0.6
-                    else "**MODERATE**" if prob > 0.3
-                    else "**LOW**"
-                )
-                st.markdown(f"**Prediction**: {label} likelihood of call-up (probability = `{prob:.3f}`)")
+                with lr_tab:
+                    if log_reg_model is None or 'pred_prob_lr' not in pred_row:
+                        st.warning("Logistic Regression model is not available.")
+                    else:
+                        prob = float(pred_row['pred_prob_lr'])
+                        st.write(f"Using data from season **{season_display}**.")
+                        fig = go.Figure(go.Indicator(
+                            mode="gauge+number",
+                            value=prob * 100,
+                            title={'text': "Call-Up Probability"},
+                            gauge={
+                                'axis': {'range': [None, 100]},
+                                'bar': {'color': "darkblue"},
+                                'steps': [
+                                    {'range': [0, 25], 'color': "lightgray"},
+                                    {'range': [25, 50], 'color': "lightyellow"},
+                                    {'range': [50, 75], 'color': "lightgreen"},
+                                    {'range': [75, 100], 'color': "green"}
+                                ]
+                            }
+                        ))
+                        st.plotly_chart(fig, use_container_width=True)
+
+                        label = (
+                            "**HIGH**" if prob > 0.6
+                            else "**MODERATE**" if prob > 0.3
+                            else "**LOW**"
+                        )
+                        st.markdown(f"**Prediction**: {label} likelihood of call-up (probability = `{prob:.3f}`)")
+
+                with xgb_tab:
+                    if xgb_model is None or 'pred_callup_xgb' not in pred_row:
+                        st.warning("XGBoost model is not available.")
+                    else:
+                        pred_class = int(pred_row['pred_callup_xgb'])
+                        prob_xgb = float(pred_row.get('pred_prob_xgb', pred_class))
+                        class_label = "Called Up" if pred_class == 1 else "Not Called Up"
+                        st.metric("Predicted Outcome", class_label)
+                        st.metric("Class (0 = No, 1 = Yes)", pred_class)
+                        st.markdown(f"**Model confidence**: `{prob_xgb:.3f}` probability of call-up")
 
                 # Actual historical outcome
                 actual_text = "WAS CALLED UP (1)" if actual_called_up == 1 else "WAS NOT CALLED UP (0)"
                 st.markdown(f"**Historical Outcome**: {actual_text}")
 
         # Player leaderboard (all players)
-        if latest_predictions_df is not None and model is not None:
+        if latest_predictions_df is not None and log_reg_model is not None:
             st.markdown("---")
             st.subheader("📈 Player Leaderboard (Model Predictions)")
 
-            leaderboard_df = latest_predictions_df.copy()
-            leaderboard_df = leaderboard_df[
-                ['player_name', 'season_year', 'position', 'pred_prob', 'called_up']
-            ].drop_duplicates()
+            base_cols = ['player_name', 'season_year', 'position', 'pred_prob', 'called_up']
+            if 'pred_callup_xgb' in latest_predictions_df.columns:
+                base_cols.insert(3, 'pred_callup_xgb')
+
+            leaderboard_df = latest_predictions_df[base_cols].drop_duplicates()
 
             col_lb1, col_lb2 = st.columns([1, 1])
             with col_lb1:
@@ -466,6 +571,7 @@ elif page == "👤 Player Prediction":
                 pred_prob_pct=lambda d: d['pred_prob'] * 100,
                 called_up_label=lambda d: d['called_up'].map({1: "Yes", 0: "No"}),
             )
+            has_xgb_preds = 'pred_callup_xgb' in leaderboard_df.columns
 
             fig_lb = px.bar(
                 leaderboard_df,
@@ -479,13 +585,21 @@ elif page == "👤 Player Prediction":
             fig_lb.update_layout(xaxis_tickangle=-60, height=500)
             st.plotly_chart(fig_lb, use_container_width=True)
 
+            display_cols = ['player_name', 'season_year', 'position']
+            if has_xgb_preds:
+                display_cols.append('pred_callup_xgb')
+            display_cols.extend(['pred_prob_pct', 'called_up_label'])
+
+            rename_map = {
+                'pred_prob_pct': 'pred_prob (%)',
+                'called_up_label': 'actually_called_up',
+            }
+            if has_xgb_preds:
+                rename_map['pred_callup_xgb'] = 'pred_callup (0-1)'
+
             st.dataframe(
-                leaderboard_df[['player_name', 'season_year', 'position', 'pred_prob', 'pred_prob_pct', 'called_up_label']]
-                .rename(columns={
-                    'pred_prob': 'pred_prob (0-1)',
-                    'pred_prob_pct': 'pred_prob (%)',
-                    'called_up_label': 'actually_called_up',
-                })
+                leaderboard_df[display_cols]
+                .rename(columns=rename_map)
                 .reset_index(drop=True),
                 use_container_width=True,
             )
@@ -517,7 +631,7 @@ elif page == "🏀 Team Analysis":
         # Prepare predictions merged with rosters for team-level analysis
         team_roster = rosters_df[rosters_df['team_name'] == team_name]
         
-        if latest_predictions_df is not None:
+        if latest_predictions_df is not None and 'pred_prob' in latest_predictions_df.columns:
             team_pred_merge = rosters_df.merge(
                 latest_predictions_df[['player_name', 'pred_prob']],
                 on='player_name',
@@ -564,7 +678,7 @@ elif page == "🏀 Team Analysis":
         st.plotly_chart(fig, use_container_width=True)
         
         # Predicted probabilities for this team
-        if team_pred_merge is not None and model is not None:
+        if team_pred_merge is not None and log_reg_model is not None:
             st.subheader("🔮 Player Call-Up Probabilities (Model Predictions)")
             this_team = team_pred_merge[team_pred_merge['team_name'] == team_name].copy()
             this_team = this_team[['player_name', 'position', 'pred_prob']].drop_duplicates()
@@ -590,7 +704,7 @@ elif page == "🏀 Team Analysis":
             )
 
         # Team comparison view
-        if compare_teams and team_pred_merge is not None and model is not None:
+        if compare_teams and team_pred_merge is not None and log_reg_model is not None:
             st.markdown("---")
             st.subheader("📈 Team Comparison (Average Predicted Call-Up Probability)")
             comp_df = (
@@ -616,7 +730,7 @@ elif page == "🏀 Team Analysis":
                 st.info("No prediction data available for the selected comparison teams.")
 
         # Global team leaderboard (all teams)
-        if team_pred_merge is not None and model is not None:
+        if team_pred_merge is not None and log_reg_model is not None:
             st.markdown("---")
             st.subheader("🏆 Team Leaderboard (Avg Predicted Call-Up Probability)")
 
@@ -857,228 +971,84 @@ elif page == "🔍 Model Insights":
     st.header("🔍 Model Insights & Performance")
     
     tab1, tab2 = st.tabs(["📊 Performance Metrics", "🎯 Feature Importance"])
+    model_metrics_summary = {}
     
     with tab1:
         st.subheader("Model Performance Metrics")
 
-        if prediction_df is None or model is None:
-            st.warning("Prediction dataset or trained model not available.")
+        if prediction_df is None or (log_reg_model is None and xgb_model is None):
+            st.warning("Prediction dataset or trained models not available.")
         else:
-            # Tuned Logistic Regression metrics captured from analysis.ipynb (5-fold CV)
-            LOGREG_TUNED_DISPLAY = {
-                'label': "5-fold CV (tuned)",
-                'f1': 0.280702,
-                'precision': 0.173913,
-                'recall': 0.727273,
-                'roc_auc': 0.846591,
-                'pr_auc': 0.338023,
-            }
-
-            # Recreate stratified splits (same strategy as in analysis.ipynb) for diagnostic plots
-            from sklearn.model_selection import train_test_split
-
             exclude_cols = ['player_name', 'season_year', 'called_up']
             feature_cols = [c for c in prediction_df.columns if c not in exclude_cols]
-
-            X = prediction_df[feature_cols].copy()
-            y = prediction_df['called_up'].copy()
-
-            X_temp, X_test_mi, y_temp, y_test_mi = train_test_split(
-                X, y, test_size=0.2, stratify=y, random_state=42
-            )
-            X_train_mi, X_val_mi, y_train_mi, y_val_mi = train_test_split(
-                X_temp, y_temp, test_size=0.25, stratify=y_temp, random_state=42
-            )
-
-            categorical_cols = ['position'] if 'position' in feature_cols else []
-            numeric_cols = [col for col in feature_cols if col not in categorical_cols]
 
             top_feature_list = None
             if feature_importance_df is not None:
                 top_feature_list = feature_importance_df.sort_values(
                     'Abs_Correlation', ascending=False
                 )['Feature'].head(5).tolist()
-            elif numeric_cols:
-                top_feature_list = numeric_cols[:5]
+            else:
+                top_feature_list = feature_cols[:5] if feature_cols else []
 
             st.markdown("""
-            **Production model**: `Logistic Regression (StandardScaler + OneHotEncoder + class_weight='balanced', C=0.01)`  
             **Feature set**: {} engineered player-season statistics{}.
             """.format(
                 len(feature_cols),
                 f" (top signals: {', '.join(top_feature_list)})" if top_feature_list else ""
             ))
 
-            def evaluate_pipeline(
-                fitted_model,
-                X_set,
-                y_set,
-                name: str,
-                threshold: float | None = None,
-                optimize_threshold: bool = False,
-            ):
-                """Return full metric dictionary with optional threshold tuning."""
-                y_proba = fitted_model.predict_proba(X_set)[:, 1]
+            # Historical benchmarks from analysis.ipynb (validation set results)
+            LOGREG_TUNED_DISPLAY = {
+                'Model': 'Logistic Regression',
+                'F1-Score': 0.280702,
+                'Precision': 0.173913,
+                'Recall': 0.727273,
+                'ROC-AUC': 0.846591,
+                'PR-AUC': 0.338023,
+            }
+            XGB_BASELINE_DISPLAY = {
+                'Model': 'XGBoost',
+                'F1-Score': 0.300000,
+                'Precision': 0.333333,
+                'Recall': 0.272727,
+                'ROC-AUC': 0.830966,
+                'PR-AUC': 0.230214,
+            }
 
-                best_threshold = 0.5 if threshold is None else threshold
-                if optimize_threshold:
-                    candidate_thresholds = np.linspace(0.05, 0.95, 19)
-                    best_f1 = -1.0
-                    for thr in candidate_thresholds:
-                        trial_pred = (y_proba >= thr).astype(int)
-                        trial_f1 = f1_score(y_set, trial_pred, zero_division=0)
-                        if trial_f1 > best_f1:
-                            best_f1 = trial_f1
-                            best_threshold = thr
-
-                y_pred = (y_proba >= best_threshold).astype(int)
-                return {
-                    'name': name,
-                    'f1': f1_score(y_set, y_pred, zero_division=0),
-                    'precision': precision_score(y_set, y_pred, zero_division=0),
-                    'recall': recall_score(y_set, y_pred, zero_division=0),
-                    'roc_auc': roc_auc_score(y_set, y_proba),
-                    'pr_auc': average_precision_score(y_set, y_proba),
-                    'y_true': y_set,
-                    'y_pred': y_pred,
-                    'y_proba': y_proba,
-                    'threshold': best_threshold,
+            st.markdown("#### Model Performance (from `analysis.ipynb` validation results)")
+            historical_rows = []
+            if log_reg_model is not None:
+                historical_rows.append(LOGREG_TUNED_DISPLAY)
+                model_metrics_summary['Logistic Regression'] = {
+                    'f1': LOGREG_TUNED_DISPLAY['F1-Score'],
+                    'precision': LOGREG_TUNED_DISPLAY['Precision'],
+                    'recall': LOGREG_TUNED_DISPLAY['Recall'],
+                    'roc_auc': LOGREG_TUNED_DISPLAY['ROC-AUC'],
+                    'pr_auc': LOGREG_TUNED_DISPLAY['PR-AUC'],
+                }
+            if xgb_model is not None:
+                historical_rows.append(XGB_BASELINE_DISPLAY)
+                model_metrics_summary['XGBoost'] = {
+                    'f1': XGB_BASELINE_DISPLAY['F1-Score'],
+                    'precision': XGB_BASELINE_DISPLAY['Precision'],
+                    'recall': XGB_BASELINE_DISPLAY['Recall'],
+                    'roc_auc': XGB_BASELINE_DISPLAY['ROC-AUC'],
+                    'pr_auc': XGB_BASELINE_DISPLAY['PR-AUC'],
                 }
 
-            # Fit for diagnostics (confusion matrix, ROC, etc.)
-            live_val_metrics = evaluate_pipeline(
-                model, X_val_mi, y_val_mi, "Validation", optimize_threshold=True
-            )
-            best_threshold = live_val_metrics['threshold']
-            test_metrics = evaluate_pipeline(
-                model, X_test_mi, y_test_mi, "Test", threshold=best_threshold
-            )
-
-            # Metrics summary (display tuned hyperparameter results)
-            st.markdown("#### Tuned Logistic Regression (5-fold Cross-Validation)")
-            metrics_df = pd.DataFrame([{
-                'Benchmark': LOGREG_TUNED_DISPLAY['label'],
-                'F1-Score': LOGREG_TUNED_DISPLAY['f1'],
-                'Precision': LOGREG_TUNED_DISPLAY['precision'],
-                'Recall': LOGREG_TUNED_DISPLAY['recall'],
-                'ROC-AUC': LOGREG_TUNED_DISPLAY['roc_auc'],
-                'PR-AUC': LOGREG_TUNED_DISPLAY['pr_auc'],
-            }])
-            st.dataframe(metrics_df.style.format({
-                'F1-Score': "{:.3f}",
-                'Precision': "{:.3f}",
-                'Recall': "{:.3f}",
-                'ROC-AUC': "{:.3f}",
-                'PR-AUC': "{:.3f}",
-            }), use_container_width=True)
-
-            col1m, col2m, col3m, col4m = st.columns(4)
-            with col1m:
-                st.metric("Tuned F1-Score", f"{LOGREG_TUNED_DISPLAY['f1']:.3f}")
-            with col2m:
-                st.metric("Tuned Precision", f"{LOGREG_TUNED_DISPLAY['precision']:.3f}")
-            with col3m:
-                st.metric("Tuned Recall", f"{LOGREG_TUNED_DISPLAY['recall']:.3f}")
-            with col4m:
-                st.metric("Tuned ROC-AUC", f"{LOGREG_TUNED_DISPLAY['roc_auc']:.3f}")
-
-            # Confusion matrix (test set)
-            st.markdown("#### Confusion Matrix (Test Set)")
-            cm = confusion_matrix(test_metrics['y_true'], test_metrics['y_pred'])
-            cm_df = pd.DataFrame(
-                cm,
-                index=['Actual 0 (Not Called Up)', 'Actual 1 (Called Up)'],
-                columns=['Pred 0', 'Pred 1'],
-            )
-            fig_cm = px.imshow(
-                cm_df,
-                text_auto=True,
-                color_continuous_scale="Blues",
-                labels=dict(x="Predicted", y="Actual", color="Count"),
-                title="Confusion Matrix (Test Set)",
-            )
-            st.plotly_chart(fig_cm, use_container_width=True)
-
-            # ROC & PR curves (test set)
-            st.markdown("#### ROC & Precision-Recall Curves (Test Set)")
-            fpr, tpr, _ = roc_curve(test_metrics['y_true'], test_metrics['y_proba'])
-            precision, recall, _ = precision_recall_curve(test_metrics['y_true'], test_metrics['y_proba'])
-
-            fig_curves = go.Figure()
-            fig_curves.add_trace(go.Scatter(
-                x=fpr, y=tpr, mode='lines',
-                name=f"ROC Curve (AUC={test_metrics['roc_auc']:.3f})",
-                line=dict(color="#e74c3c")
-            ))
-            fig_curves.add_trace(go.Scatter(
-                x=[0, 1], y=[0, 1], mode='lines',
-                name="Random", line=dict(color="gray", dash='dash')
-            ))
-            fig_curves.update_layout(
-                title="ROC Curve (Test Set)",
-                xaxis_title="False Positive Rate",
-                yaxis_title="True Positive Rate",
-            )
-            st.plotly_chart(fig_curves, use_container_width=True)
-
-            fig_pr = go.Figure()
-            fig_pr.add_trace(go.Scatter(
-                x=recall, y=precision, mode='lines',
-                name=f"PR Curve (AUC={test_metrics['pr_auc']:.3f})",
-                line=dict(color="#3498db")
-            ))
-            fig_pr.update_layout(
-                title="Precision-Recall Curve (Test Set)",
-                xaxis_title="Recall",
-                yaxis_title="Precision",
-            )
-            st.plotly_chart(fig_pr, use_container_width=True)
-
-            # Additional baseline models (pre-computed validation benchmarks)
-            st.markdown("#### Baseline Model Benchmarks (Validation Set)")
-
-            baseline_benchmarks = pd.DataFrame([
-                {
-                    'Model': 'XGBoost',
-                    'F1-Score': 0.300000,
-                    'Precision': 0.333333,
-                    'Recall': 0.272727,
-                    'ROC-AUC': 0.830966,
-                    'PR-AUC': 0.230214,
-                },
-                {
-                    'Model': 'Random Forest',
-                    'F1-Score': 0.166667,
-                    'Precision': 1.000000,
-                    'Recall': 0.090909,
-                    'ROC-AUC': 0.892756,
-                    'PR-AUC': 0.272643,
-                },
-            ])
-
-            st.info(
-                "These baseline values are pulled directly from the validation comparison in "
-                "`analysis.ipynb`. They give you a quick reference for how the tree-based models "
-                "performed without forcing the Streamlit app to retrain heavy estimators."
-            )
-
-            st.dataframe(
-                baseline_benchmarks.style.format({
-                    'F1-Score': "{:.3f}",
-                    'Precision': "{:.3f}",
-                    'Recall': "{:.3f}",
-                    'ROC-AUC': "{:.3f}",
-                    'PR-AUC': "{:.3f}",
-                }),
-                use_container_width=True,
-            )
-
-            st.markdown("""
-            **Why Logistic Regression remains in production:**  
-            - Tuned Logistic Regression still reaches an F1-score of **0.28** with strong recall (0.73), providing dependable detection of rare call-ups.  
-            - XGBoost did edge it out slightly on F1 (0.30) but produced less interpretable decision boundaries, making it harder to explain to coaches and front-office staff.  
-            - The linear model’s coefficients map directly to the feature importance analysis below, so we can clearly justify every recommendation while keeping maintenance simple.
-            """)
+            if historical_rows:
+                st.dataframe(
+                    pd.DataFrame(historical_rows).style.format({
+                        'F1-Score': "{:.3f}",
+                        'Precision': "{:.3f}",
+                        'Recall': "{:.3f}",
+                        'ROC-AUC': "{:.3f}",
+                        'PR-AUC': "{:.3f}",
+                    }),
+                    use_container_width=True,
+                )
+            else:
+                st.info("Run `analysis.ipynb` to populate model benchmarks.")
     
     with tab2:
         st.subheader("Feature Importance")
@@ -1107,6 +1077,35 @@ elif page == "🔍 Model Insights":
             """)
         else:
             st.info("Feature importance file not found. Please generate it from EDA.")
+
+    st.markdown("---")
+    st.markdown("### Why We Use Both Logistic Regression and XGBoost")
+
+    if model_metrics_summary:
+        lr_metrics = model_metrics_summary.get('Logistic Regression')
+        xgb_metrics = model_metrics_summary.get('XGBoost')
+
+        bullet_lines = []
+        if lr_metrics:
+            bullet_lines.append(
+                f"- **Logistic Regression** keeps recall high "
+                f"({lr_metrics['recall']:.2%}) and surfaces calibrated probabilities "
+                f"({lr_metrics['precision']:.2%} precision) so the gauge component remains easy to explain."
+            )
+        if xgb_metrics:
+            bullet_lines.append(
+                f"- **XGBoost** offers crisper precision "
+                f"({xgb_metrics['precision']:.2%}) and stronger overall F1 ({xgb_metrics['f1']:.2%}), "
+                "which we use for binary call-up flags and leaderboard rankings."
+            )
+        if bullet_lines:
+            st.markdown("\n".join(bullet_lines))
+
+    st.markdown(
+        "- Together, LR provides transparent probability estimates for every player, while XGBoost flags the "
+        "most call-up ready prospects with fewer false positives. Coaches get interpretable insights and a "
+        "high-precision shortlist in the same view."
+    )
 # Footer
 st.markdown("---")
 st.markdown("""
